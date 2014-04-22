@@ -10,13 +10,13 @@ import zan.game.object.Shape;
 public class Block extends BaseObject {
 	
 	private int type;
-	
 	private boolean color;
 	
 	public Block(int st) {
 		super();
 		setName("block");
 		type = st;
+		color = false;
 		shape = new Shape();
 		if (type == 1) {
 			shape.addPoint(0f, 0f);
@@ -41,7 +41,6 @@ public class Block extends BaseObject {
 			shape.addPoint(1f, 0f);
 		}
 		shape.fix();
-		color = false;
 	}
 	
 	public void color() {color = true;}
@@ -53,7 +52,6 @@ public class Block extends BaseObject {
 	
 	public void render() {
 		glDisable(GL_TEXTURE_2D);
-		
 		glPushMatrix();
 		
 		glTranslatef(pos.x, pos.y, 0f);
@@ -61,18 +59,15 @@ public class Block extends BaseObject {
 		glRotatef(-angle, 0f, 0f, 1f);
 		
 		if (color) glColor4f(0f, 0f, 1f, 1f);
-		
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {
 				Vector2f vertex = shape.getPoint(i);
 				glVertex2f(vertex.x - 0.5f, vertex.y - 0.5f);
 			}
 		glEnd();
-		
 		glColor4f(1f, 1f, 1f, 1f);
 		
 		glPopMatrix();
-		
 		glEnable(GL_TEXTURE_2D);
 	}
 	

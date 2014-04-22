@@ -3,6 +3,7 @@
 textures {
 	bot_idle file=greenbot_idle.png
 	bot_move file=greenbot_move.png
+	plasmacannon file=plasmacannon.png
 }
 
 sprites {
@@ -19,4 +20,5 @@ sprites {
 	bot_move9 tex=bot_move w=1536 h=128 x0=1152 y0=0 x1=1280 y1=128
 	bot_move10 tex=bot_move w=1536 h=128 x0=1280 y0=0 x1=1408 y1=128
 	bot_move11 tex=bot_move w=1536 h=128 x0=1408 y0=0 x1=1536 y1=128
+	plasmacannon tex=plasmacannon w=768 h=256 x0=0 y0=0 x1=768 y1=256
 }

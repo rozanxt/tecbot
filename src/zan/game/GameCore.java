@@ -26,6 +26,7 @@ import zan.game.sound.SoundManager;
 import zan.game.sprite.SpriteManager;
 import zan.game.sprite.TextManager;
 import zan.game.sprite.TextureManager;
+import zan.game.util.CameraPort;
 import zan.game.util.GameUtility;
 import zan.game.util.IconLoader;
 import zan.tecbot.panel.GamePanel;
@@ -110,6 +111,7 @@ public class GameCore {
 		SpriteManager.init();
 		TextManager.init();
 		SoundManager.init();
+		CameraPort.init();
 	}
 	
 	/** Initialize display */

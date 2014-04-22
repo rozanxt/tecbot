@@ -22,6 +22,9 @@ public class Sprite implements ISprite {
 		textureX1 = tcx1; textureY1 = tcy1;
 	}
 	
+	/** @return Texture ID */
+	public int getTextureID() {return textureID;}
+	
 	/** @return Sprite dimensions */
 	public int getSpriteWidth() {return textureX1 - textureX0;}
 	public int getSpriteHeight() {return textureY1 - textureY0;}
@@ -84,7 +87,6 @@ public class Sprite implements ISprite {
 		glRotatef(rot, 0f, 0f, 1f);
 		
 		glColor4f(1f, 1f, 1f, alpha);
-		
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		
 		glBegin(GL_QUADS);
