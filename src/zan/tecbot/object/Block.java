@@ -15,39 +15,32 @@ public class Block extends BaseObject {
 	
 	public Block(int st) {
 		super();
+		setName("block");
 		type = st;
+		shape = new Shape();
 		if (type == 1) {
-			setName("slope");
-			shape = new Shape();
 			shape.addPoint(0f, 0f);
 			shape.addPoint(1f, 1f);
 			shape.addPoint(1f, 0f);
 		} else if (type == 2) {
-			setName("slope");
-			shape = new Shape();
 			shape.addPoint(0f, 0f);
 			shape.addPoint(0f, 1f);
 			shape.addPoint(1f, 0f);
 		} else if (type == 3) {
-			setName("block");
-			shape = new Shape();
 			shape.addPoint(0f, 0f);
 			shape.addPoint(0f, 1f);
 			shape.addPoint(1f, 1f);
 		} else if (type == 4) {
-			setName("block");
-			shape = new Shape();
 			shape.addPoint(0f, 1f);
 			shape.addPoint(1f, 1f);
 			shape.addPoint(1f, 0f);
 		} else {
-			setName("block");
-			shape = new Shape();
 			shape.addPoint(0f, 0f);
 			shape.addPoint(0f, 1f);
 			shape.addPoint(1f, 1f);
 			shape.addPoint(1f, 0f);
 		}
+		shape.fix();
 		color = false;
 	}
 	
@@ -77,15 +70,6 @@ public class Block extends BaseObject {
 		glEnd();
 		
 		glColor4f(1f, 1f, 1f, 1f);
-		
-		/*glColor3f(1f, 0f, 0f);
-		glBegin(GL_POLYGON);
-			glVertex2f(-0.01f, 0.01f);
-			glVertex2f(0.01f, 0.01f);
-			glVertex2f(0.01f, -0.01f);
-			glVertex2f(-0.01f, -0.01f);
-		glEnd();
-		glColor3f(1f, 1f, 1f);*/
 		
 		glPopMatrix();
 		

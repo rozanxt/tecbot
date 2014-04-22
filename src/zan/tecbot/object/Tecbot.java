@@ -3,8 +3,10 @@ package zan.tecbot.object;
 import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector2f;
 
+import zan.game.GameCore;
 import zan.game.input.InputManager;
 import zan.game.object.BaseObject;
 import zan.game.object.Collision;
@@ -23,6 +25,8 @@ public class Tecbot extends BaseObject {
 	protected boolean onmoving;
 	protected boolean moving;
 	protected int facing;
+	
+	public float gunangle;
 	
 	public Tecbot() {
 		super();
@@ -45,6 +49,8 @@ public class Tecbot extends BaseObject {
 		onmoving = false;
 		moving = false;
 		facing = 0;
+		
+		gunangle = 0f;
 	}
 	
 	public void collide(BaseObject obj, Collision col) {
@@ -57,20 +63,12 @@ public class Tecbot extends BaseObject {
 		
 		// QUICK FIX
 		if (!col.normFriction()) {
-			/*if (obj.getName() == "block") { 
-				if (getSupportPoint(new Vector2f(0f, -1f)).y >= obj.getSupportPoint(new Vector2f(0f, 1f)).y-10f) {
-					setY(getY()+norm.y*(1f-col.distance));
-				} else {
-					setX(getX()+norm.x*(1f-col.distance));
-				}
-			} else if (obj.getName() == "slope") {*/
-				Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
-				if (foot.y >= obj.getGroundSupportPoint(foot).y-15f) {
-					setY(getY()+norm.y*(1f-col.distance));
-				} else {
-					setX(getX()+norm.x*(1f-col.distance));
-				}
-			//}
+			Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
+			if (foot.y >= obj.getGroundSupportPoint(foot).y-15f) {
+				setY(getY()+norm.y*(1f-col.distance));
+			} else {
+				setX(getX()+norm.x*(1f-col.distance));
+			}
 		}
 		if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
 		
@@ -90,15 +88,15 @@ public class Tecbot extends BaseObject {
 			setDY(-5f);
 			if (InputManager.isKeyDown(Keyboard.KEY_W)) {applyForceY(7f); setDY(0f); ground = false; onground = false;}
 			if (InputManager.isKeyDown(Keyboard.KEY_D)) {
-				applyForceX(0.5f); moving = true; facing = 0;
+				applyForceX(0.5f); moving = true;
 			}
 			if (InputManager.isKeyDown(Keyboard.KEY_A)) {
-				applyForceX(-0.5f); moving = true; facing = 1;
+				applyForceX(-0.5f); moving = true;
 				
 			}
 		} else {
-			if (InputManager.isKeyDown(Keyboard.KEY_D)) {applyForceX(0.1f); facing = 0;}
-			if (InputManager.isKeyDown(Keyboard.KEY_A)) {applyForceX(-0.1f); facing = 1;}
+			if (InputManager.isKeyDown(Keyboard.KEY_D)) {applyForceX(0.1f);}
+			if (InputManager.isKeyDown(Keyboard.KEY_A)) {applyForceX(-0.1f);}
 			applyForce(0f, -0.25f);
 		}
 		
@@ -107,14 +105,51 @@ public class Tecbot extends BaseObject {
 		ground = false;
 		super.update();
 		anim.update();
+		
+		float ox = (Mouse.getX()-(GameCore.SCR_WIDTH/2f))*0.5f;
+		float oy = (Mouse.getY()-(GameCore.SCR_HEIGHT/2f))*0.5f;
+		
+		if (ox > 0f) {
+			if (oy > 0f) gunangle = 360f-(float)(Math.atan(oy/ox)*(180f/Math.PI));
+			else if (oy < 0f) gunangle = -(float)(Math.atan(oy/ox)*(180f/Math.PI));
+			else gunangle = 0f;
+			facing = 0;
+		} else if (ox < 0f) {
+			gunangle = 180f-(float)(Math.atan(oy/ox)*(180f/Math.PI));
+			facing = 1;
+		} else {
+			if (oy > 0f) gunangle = -90f;
+			else if (oy < 0f) gunangle = 90f;
+		}
 	}
 	
 	public void render() {
 		if (moving) sprite[1].render(getX(), getY(), getSize(), 0f, facing, 1f);
 		else sprite[0].render(getX(), getY(), getSize(), 0f, facing, 1f);
+		
 		glColor4f(1f, 0f, 1f, 1f);
 		super.render();
 		glColor4f(1f, 1f, 1f, 1f);
+		
+		
+		glDisable(GL_TEXTURE_2D);
+		glPushMatrix();
+		
+		glTranslatef(pos.x, pos.y, 0f);
+		glScalef(size, size, 0f);
+		glRotatef(-gunangle, 0f, 0f, 1f);
+		
+		glColor4f(1f, 0f, 0f, 1f);
+		glBegin(GL_LINE_LOOP);
+			glVertex2f(-0.05f, -0.05f);
+			glVertex2f(-0.05f, 0.05f);
+			glVertex2f(0.4f, 0.05f);
+			glVertex2f(0.4f, -0.05f);
+		glEnd();
+		glColor4f(1f, 1f, 1f, 1f);
+		
+		glPopMatrix();
+		glEnable(GL_TEXTURE_2D);
 	}
 	
 }

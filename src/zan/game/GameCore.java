@@ -38,10 +38,10 @@ public class GameCore {
 	private static final String title = "Game Title";
 	
 	/** Screen resolutions */
-	private static int SCR_WIDTH, SCR_HEIGHT;
+	public static int SCR_WIDTH, SCR_HEIGHT;
 	
 	/** Game dimensions */
-	private static int GAME_WIDTH = 800, GAME_HEIGHT = 600;
+	public static int GAME_WIDTH = 800, GAME_HEIGHT = 600;
 	
 	/** Game started state */
 	private static boolean started = false;
@@ -146,11 +146,6 @@ public class GameCore {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		adjustViewPort();
-		
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0f, (float)GAME_WIDTH, 0f, (float)GAME_HEIGHT, -1f, 1f);
-		glMatrixMode(GL_MODELVIEW);
 	}
 	
 	/** Load resources */
@@ -271,7 +266,6 @@ public class GameCore {
 		//TODO
 		if (gamePanel != null && gamePanel.isInitialized()) gamePanel.render();
 		
-		TextManager.renderText("FPS: " + getFPS(), "defont", 5f, GAME_HEIGHT - 5f, 10f, 6);
 	}
 	
 	// -------------------------------------------------------------------------------------------------------- //
