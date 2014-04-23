@@ -36,6 +36,7 @@ public class GamePanel implements IPanel {
 		initialized = false;
 		gridMap = null;
 		gamePlayer = null;
+		tecbot = null;
 		entities = new ArrayList<BaseEntity>();
 		blocks = new ArrayList<Block>();
 		bullets = new ArrayList<Bullet>();
@@ -53,12 +54,13 @@ public class GamePanel implements IPanel {
 		tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
 		tecbot.spawn();
 		
-		gamePlayer = new Player(this, tecbot);
+		gamePlayer = new Player(this);
 		
 		InputManager.setMouseGrabbed(true);
 		initialized = true;
 	}
 	
+	public Tecbot getTecbot() {return tecbot;}
 	public ArrayList<Bullet> getBullets() {return bullets;}
 	
 	public void update() {
@@ -68,6 +70,10 @@ public class GamePanel implements IPanel {
 			
 			// Update Objects
 			if (tecbot.isActive()) tecbot.update();
+			else {
+				tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
+				tecbot.spawn();
+			}
 			for (int i=0;i<entities.size();i++) {
 				if (i >= entities.size()) break;
 				if (entities.get(i).isActive()) entities.get(i).update();
@@ -81,7 +87,7 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).update();
 			
 			// Create Collision Pairs
-			if (tecbot.isActive()) tecbot.BlocksInRange(pairs, blocks);
+			if (tecbot.isActive()) {tecbot.BlocksInRange(pairs, blocks); tecbot.EntitiesInRange(pairs, entities);}
 			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).BlocksInRange(pairs, blocks);
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) {bullets.get(i).BlocksInRange(pairs, blocks); bullets.get(i).EntitiesInRange(pairs, entities);}
 			
@@ -104,9 +110,8 @@ public class GamePanel implements IPanel {
 		for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).render();
 		if (tecbot.isActive()) tecbot.render();
 		
+		float[] mp = GameCore.ScreenToLogic(InputManager.getMouseX(), InputManager.getMouseY());
 		if (Mouse.isGrabbed()) {
-			float[] mp = GameCore.ScreenToLogic(InputManager.getMouseX(), InputManager.getMouseY());
-			
 			glDisable(GL_TEXTURE_2D);
 			glPushMatrix();
 			
@@ -159,9 +164,10 @@ public class GamePanel implements IPanel {
 		
 		CameraPort.viewGUI();
 		TextManager.renderText("FPS: " + GameCore.getFPS(), "defont", 5f, GameCore.GAME_HEIGHT - 5f, 10f, 6);
-		TextManager.renderText("Gun Angle: " + tecbot.getGunAngle(), "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
+		TextManager.renderText("Mouse Position: " + mp[0] + " " + mp[1], "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
 		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
 		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
+		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);
 		
 		if (!Mouse.isGrabbed()) {
 			glDisable(GL_TEXTURE_2D);

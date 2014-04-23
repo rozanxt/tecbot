@@ -37,7 +37,12 @@ public class CameraPort {
 			//if (Math.abs(ox) > 200f) ox = ox*200f/Math.abs(ox);
 			//if (Math.abs(oy) > 150f) oy = oy*150f/Math.abs(oy);
 			
-			dcam_x += ((-vx-ox)-dcam_x)*0.1f; dcam_y += ((-vy-oy)-dcam_y)*0.1f;
+			float distx = (-vx-ox)-dcam_x;
+			float disty = (-vy-oy)-dcam_y;
+			if (Math.abs(distx) > 1f) dcam_x += distx*0.1f;
+			else dcam_x = (-vx-ox);
+			if (Math.abs(disty) > 1f) dcam_y += disty*0.1f;
+			else dcam_y = (-vy-oy);
 		}
 		
 		glMatrixMode(GL_PROJECTION);

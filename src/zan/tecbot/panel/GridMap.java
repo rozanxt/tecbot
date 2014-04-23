@@ -8,23 +8,9 @@ import zan.tecbot.object.entity.*;
 import zan.tecbot.object.block.*;
 
 public class GridMap {
-						//0000000000111111111122222222223333333333
-						//0123456789012345678901234567890123456789
-	/*private String map = "0                      02               " + //A
-						 "0                      402              " + //B
-						 "0               b       402             " + //C
-						 "00002       10002        402            " + //D
-						 "  4002      43 43     02  40000002      " + //E
-						 "   4002               402  4000000      " + //F
-						 "    400     b          402      402     " + //G
-						 "00        402           402  b   00   00" + //H
-						 "03              102      40000   03   40" + //I
-						 "0      1                               0" + //J
-						 "0 s   10                               0" + //K
-						 "0    1002            12                0" + //L
-						 "000000000000050000 000000000000500005000" + //M
-						 "                 0 0                    " + //N
-						 "                 000                    ";  //O*/
+	
+	public static final float tileWidth = 40f, tileHeight = 40f;
+	public static final float tileSize = Math.max(tileWidth, tileHeight);
 	
 	private String mapData;
 	private int mapWidth, mapHeight;
@@ -45,49 +31,49 @@ public class GridMap {
 		for (int j=0;j<mapHeight;j++) {
 			for (int i=0;i<mapWidth;i++) {
 				char code = mapData.charAt(i+j*mapWidth);
+				float tileX = (tileWidth*0.5f)+i*tileWidth;
+				float tileY = (tileHeight*(mapHeight-0.5f))-j*tileHeight;
 				if (code == 's') {
-					playerSpawn.setX(20f+i*40f);
-					playerSpawn.setY(580f-j*40f);
+					playerSpawn.set(tileX, tileY);
 				} else if (code == 'b') {
-					BadBot badbot = new BadBot();
-					badbot.setPos(20f+i*40f, 580f-j*40f);
-					badbot.setSize(100f);
+					DummBot badbot = new DummBot();
+					badbot.setPos(tileX, tileY);
 					badbot.spawn();
 					entities.add(badbot);
 				} else if (code == '0') {
 					SolidBlock block = new SolidBlock(0);
-					block.setPos(20f+i*40f, 580f-j*40f);
-					block.setSize(40f);
+					block.setPos(tileX, tileY);
+					block.setSize(tileSize);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '1') {
 					SolidBlock block = new SolidBlock(1);
-					block.setPos(20f+i*40f, 580f-j*40f);
-					block.setSize(40f);
+					block.setPos(tileX, tileY);
+					block.setSize(tileSize);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '2') {
 					Block block = new SolidBlock(2);
-					block.setPos(20f+i*40f, 580f-j*40f);
-					block.setSize(40f);
+					block.setPos(tileX, tileY);
+					block.setSize(tileSize);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '3') {
 					Block block = new SolidBlock(3);
-					block.setPos(20f+i*40f, 580f-j*40f);
-					block.setSize(40f);
+					block.setPos(tileX, tileY);
+					block.setSize(tileSize);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '4') {
 					Block block = new SolidBlock(4);
-					block.setPos(20f+i*40f, 580f-j*40f);
-					block.setSize(40f);
+					block.setPos(tileX, tileY);
+					block.setSize(tileSize);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '5') {
 					BumperBlock block = new BumperBlock();
-					block.setPos(20f+i*40f, 580f-j*40f);
-					block.setSize(40f);
+					block.setPos(tileX, tileY);
+					block.setSize(tileSize);
 					block.spawn();
 					blocks.add(block);
 				}

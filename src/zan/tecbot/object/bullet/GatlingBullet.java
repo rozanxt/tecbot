@@ -39,7 +39,7 @@ public class GatlingBullet extends Bullet {
 		setSize(10f);
 		setSpeed(20f);
 		setDamage(2f);
-		setRange(16000f);
+		setRange(800f);
 		setCap(getSpeed(), getSpeed());
 	}
 	

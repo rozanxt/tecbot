@@ -38,7 +38,7 @@ public class PlasmaBullet extends Bullet {
 		setSize(20f);
 		setSpeed(10f);
 		setDamage(30f);
-		setRange(16000f);
+		setRange(800f);
 		setCap(getSpeed(), getSpeed());
 	}
 	

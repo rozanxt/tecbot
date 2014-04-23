@@ -31,8 +31,7 @@ public abstract class BaseObject {
 		dycap = 10f;
 		angle = 0f;
 		size = 1f;
-		shape = new Shape();
-		shape.fix();
+		shape = null;
 		active = false;
 	}
 	

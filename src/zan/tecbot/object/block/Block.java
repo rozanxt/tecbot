@@ -12,7 +12,6 @@ public abstract class Block extends BaseObject {
 	
 	public Block() {
 		super();
-		setName("block");
 		highlight = false;
 	}
 	

@@ -76,9 +76,34 @@ public abstract class BaseEntity extends BaseObject {
 		}
 	}
 	
+	public void EntitiesInRange(ArrayList<Pair> pairs, ArrayList<BaseEntity> entities) {
+		ArrayList<BaseEntity> inrange = new ArrayList<BaseEntity>();
+		ArrayList<Float> distinrange = new ArrayList<Float>();
+		for (int i=0;i<entities.size();i++) {
+			Vector2f dist = Vector2f.sub(getPos(), entities.get(i).getPos(), null);
+			if (entities.get(i).isAlive() && dist.lengthSquared() < 10000f) {
+				inrange.add(entities.get(i));
+				distinrange.add(dist.length());
+			}
+		}
+		while (distinrange.size() > 0) {
+			float bestDist = Float.MAX_VALUE;
+			int next = 0;
+			for (int i=0;i<distinrange.size();i++) {
+				if (distinrange.get(i) < bestDist) {
+					bestDist = distinrange.get(i);
+					next = i;
+				}
+			}
+			pairs.add(new Pair(this, inrange.get(next)));
+			inrange.remove(next);
+			distinrange.remove(next);
+		}
+	}
+	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (isAlive()) {
-			if (obj.getName() == "block") {
+			if (obj instanceof Block) {
 				Vector2f norm = col.normal;
 				Vector2f negnorm = new Vector2f();
 				norm.negate(negnorm);
@@ -98,8 +123,8 @@ public abstract class BaseEntity extends BaseObject {
 				if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
 				
 				if (!moving) setDX(getDX()*0.7f);
-				return true;
 			}
+			return true;
 		}
 		return false;
 	}
@@ -123,8 +148,9 @@ public abstract class BaseEntity extends BaseObject {
 	public void update() {
 		if (isAlive() && health <= 0f) {
 			setAlive(false);
-			applyForceY(4f);
+			health = 0f;
 			setDY(0f);
+			applyForceY(5f);
 		}
 		super.update();
 	}

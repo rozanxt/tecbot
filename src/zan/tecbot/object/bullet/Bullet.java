@@ -23,7 +23,6 @@ public class Bullet extends BaseObject {
 	
 	public Bullet() {
 		super();
-		setName("bullet");
 		hostile = false;
 		playerBullet = false;
 		speed = 0f;
@@ -50,9 +49,7 @@ public class Bullet extends BaseObject {
 		if (hostile) {
 			if (obj instanceof BadBot) {
 				BadBot entity = (BadBot)obj;
-				if (entity.isAlive()) {
-					entity.inflictDamage(damage);
-				} else return false;
+				entity.inflictDamage(damage);
 			}
 			Vector2f norm = new Vector2f();
 			vel.normalise(norm);
@@ -60,7 +57,7 @@ public class Bullet extends BaseObject {
 			setY(getY()-norm.y*(1f-col.distance));
 			setVel(0f, 0f);
 			hostile = false;
-			dist = 0;
+			dist = 0f;
 			return true;
 		}
 		return false;
@@ -97,7 +94,7 @@ public class Bullet extends BaseObject {
 		ArrayList<Float> distinrange = new ArrayList<Float>();
 		for (int i=0;i<entities.size();i++) {
 			Vector2f dist = Vector2f.sub(getPos(), entities.get(i).getPos(), null);
-			if (dist.lengthSquared() < 2500f) {
+			if (entities.get(i).isAlive() && dist.lengthSquared() < 2500f) {
 				inrange.add(entities.get(i));
 				distinrange.add(dist.length());
 			}
@@ -119,7 +116,7 @@ public class Bullet extends BaseObject {
 	
 	public void update() {
 		super.update();
-		dist += vel.x*vel.x+vel.y*vel.y;
+		dist += speed;
 		if (hostile && dist > range) despawn();
 	}
 	
