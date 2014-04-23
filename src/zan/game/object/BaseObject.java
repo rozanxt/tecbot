@@ -32,10 +32,7 @@ public abstract class BaseObject {
 		angle = 0f;
 		size = 1f;
 		shape = new Shape();
-		shape.addPoint(0f, 0f);
-		shape.addPoint(0f, 1f);
-		shape.addPoint(1f, 1f);
-		shape.addPoint(1f, 0f);
+		shape.fix();
 		active = false;
 	}
 	
@@ -142,7 +139,7 @@ public abstract class BaseObject {
 		return nearestPoint;
 	}
 	
-	public void collide(BaseObject obj, Collision col) {}
+	public boolean collide(BaseObject obj, Collision col) {return false;}
 	public void correction() {}
 	
 	public void update() {

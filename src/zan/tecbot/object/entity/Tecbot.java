@@ -1,4 +1,4 @@
-package zan.tecbot.object;
+package zan.tecbot.object.entity;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -21,6 +21,7 @@ public class Tecbot extends BaseEntity {
 	public Tecbot() {
 		super();
 		setName("tecbot");
+		setSize(100f);
 		shape = new Shape();
 		shape.addPoint(0.31f, 0.15f);
 		shape.addPoint(0.31f, 0.8f);
@@ -36,6 +37,7 @@ public class Tecbot extends BaseEntity {
 		AnimatedSprite anim = (AnimatedSprite) sprite[1];
 		anim.setAnimation(true, false, 3);
 		
+		setMaxHealth(100f);
 		setCap(4f, 10f);
 		gunangle = 0f;
 	}
@@ -87,8 +89,8 @@ public class Tecbot extends BaseEntity {
 	}
 	
 	public void render() {
-		if (moving) sprite[1].render(getX(), getY(), getSize(), 0f, facing, 1f);
-		else sprite[0].render(getX(), getY(), getSize(), 0f, facing, 1f);
+		if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+		else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
 		
 		/*glColor4f(1f, 0f, 1f, 1f);
 		super.render();

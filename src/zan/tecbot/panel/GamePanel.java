@@ -13,7 +13,10 @@ import zan.game.object.Pair;
 import zan.game.panel.IPanel;
 import zan.game.sprite.TextManager;
 import zan.game.util.CameraPort;
-import zan.tecbot.object.*;
+import zan.tecbot.object.block.Block;
+import zan.tecbot.object.bullet.Bullet;
+import zan.tecbot.object.entity.BaseEntity;
+import zan.tecbot.object.entity.Tecbot;
 
 public class GamePanel implements IPanel {
 	
@@ -42,13 +45,13 @@ public class GamePanel implements IPanel {
 	public boolean isInitialized() {return initialized;}
 	
 	public void init() {
-		tecbot = new Tecbot();
-		tecbot.setPos(100f, 200f);
-		tecbot.setSize(100f);
-		tecbot.spawn();
-		
-		gridMap = new GridMap();
+		MapReader mapReader = new MapReader("map0.lgm");
+		gridMap = new GridMap(mapReader.getMapData(), mapReader.getMapWidth(), mapReader.getMapHeight());
 		gridMap.createMap(blocks, entities);
+		
+		tecbot = new Tecbot();
+		tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
+		tecbot.spawn();
 		
 		gamePlayer = new Player(this, tecbot);
 		
@@ -65,7 +68,11 @@ public class GamePanel implements IPanel {
 			
 			// Update Objects
 			if (tecbot.isActive()) tecbot.update();
-			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).update();
+			for (int i=0;i<entities.size();i++) {
+				if (i >= entities.size()) break;
+				if (entities.get(i).isActive()) entities.get(i).update();
+				else {entities.remove(i); i--;}
+			}
 			for (int i=0;i<bullets.size();i++) {
 				if (i >= bullets.size()) break;
 				if (bullets.get(i).isActive()) bullets.get(i).update();
@@ -154,6 +161,7 @@ public class GamePanel implements IPanel {
 		TextManager.renderText("FPS: " + GameCore.getFPS(), "defont", 5f, GameCore.GAME_HEIGHT - 5f, 10f, 6);
 		TextManager.renderText("Gun Angle: " + tecbot.getGunAngle(), "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
 		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
+		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
 		
 		if (!Mouse.isGrabbed()) {
 			glDisable(GL_TEXTURE_2D);

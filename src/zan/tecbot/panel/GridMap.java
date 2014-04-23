@@ -2,14 +2,15 @@ package zan.tecbot.panel;
 
 import java.util.ArrayList;
 
-import zan.tecbot.object.BadBot;
-import zan.tecbot.object.BaseEntity;
-import zan.tecbot.object.Block;
+import org.lwjgl.util.vector.Vector2f;
+
+import zan.tecbot.object.entity.*;
+import zan.tecbot.object.block.*;
 
 public class GridMap {
 						//0000000000111111111122222222223333333333
-	private int w, h;	//0123456789012345678901234567890123456789
-	private String map = "0                      02               " + //A
+						//0123456789012345678901234567890123456789
+	/*private String map = "0                      02               " + //A
 						 "0                      402              " + //B
 						 "0               b       402             " + //C
 						 "00002       10002        402            " + //D
@@ -23,56 +24,68 @@ public class GridMap {
 						 "0    1002            12                0" + //L
 						 "000000000000050000 000000000000500005000" + //M
 						 "                 0 0                    " + //N
-						 "                 000                    ";  //O
+						 "                 000                    ";  //O*/
 	
-	public GridMap() {
-		w = 40;
-		h = 15;
+	private String mapData;
+	private int mapWidth, mapHeight;
+	
+	private Vector2f playerSpawn;
+	
+	public GridMap(String md, int mw, int mh) {
+		mapData = md;
+		mapWidth = mw;
+		mapHeight = mh;
+		playerSpawn = new Vector2f(0f, 0f);
 	}
 	
+	public Vector2f getPlayerSpawn() {return playerSpawn;}
+	
 	public void createMap(ArrayList<Block> blocks, ArrayList<BaseEntity> entities) {
-		if (map.length() != w*h) return;
-		for (int j=0;j<h;j++) {
-			for (int i=0;i<w;i++) {
-				char code = map.charAt(i+j*w);
-				if (code == 'b') {
+		if (mapData.length() != mapWidth*mapHeight) return;
+		for (int j=0;j<mapHeight;j++) {
+			for (int i=0;i<mapWidth;i++) {
+				char code = mapData.charAt(i+j*mapWidth);
+				if (code == 's') {
+					playerSpawn.setX(20f+i*40f);
+					playerSpawn.setY(580f-j*40f);
+				} else if (code == 'b') {
 					BadBot badbot = new BadBot();
 					badbot.setPos(20f+i*40f, 580f-j*40f);
 					badbot.setSize(100f);
 					badbot.spawn();
 					entities.add(badbot);
 				} else if (code == '0') {
-					Block block = new Block(0);
+					SolidBlock block = new SolidBlock(0);
 					block.setPos(20f+i*40f, 580f-j*40f);
 					block.setSize(40f);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '1') {
-					Block block = new Block(1);
+					SolidBlock block = new SolidBlock(1);
 					block.setPos(20f+i*40f, 580f-j*40f);
 					block.setSize(40f);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '2') {
-					Block block = new Block(2);
+					Block block = new SolidBlock(2);
 					block.setPos(20f+i*40f, 580f-j*40f);
 					block.setSize(40f);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '3') {
-					Block block = new Block(3);
+					Block block = new SolidBlock(3);
 					block.setPos(20f+i*40f, 580f-j*40f);
 					block.setSize(40f);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '4') {
-					Block block = new Block(4);
+					Block block = new SolidBlock(4);
 					block.setPos(20f+i*40f, 580f-j*40f);
 					block.setSize(40f);
 					block.spawn();
 					blocks.add(block);
 				} else if (code == '5') {
-					Block block = new Block(5);
+					BumperBlock block = new BumperBlock();
 					block.setPos(20f+i*40f, 580f-j*40f);
 					block.setSize(40f);
 					block.spawn();

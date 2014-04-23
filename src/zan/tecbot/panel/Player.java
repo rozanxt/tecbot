@@ -4,8 +4,8 @@ import org.lwjgl.input.Keyboard;
 
 import zan.game.input.InputManager;
 import zan.game.util.GameUtility;
-import zan.tecbot.object.Bullet;
-import zan.tecbot.object.Tecbot;
+import zan.tecbot.object.bullet.*;
+import zan.tecbot.object.entity.Tecbot;
 
 public class Player {
 	
@@ -32,28 +32,22 @@ public class Player {
 		
 		if (InputManager.isButtonDown(0) && shotdelay == 0) {
 			if (getWeapon() == 1) {
-				float shotangle=playerBot.getGunAngle()+GameUtility.getRnd().nextInt(20)*0.1f-1f;
-				float spd = 20f;
-				Bullet b = new Bullet(0);
-				b.setPos(playerBot.getX()+(float)Math.cos(shotangle*(Math.PI/180f))*20f, playerBot.getY()-(float)Math.sin(shotangle*(Math.PI/180f))*20f);
-				b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*spd, -(float)Math.sin(shotangle*(Math.PI/180f))*spd);
-				b.setCap(spd, spd);
-				b.setSize(10f);
-				b.setAngle(shotangle);
-				b.spawn();
-				gamePanel.getBullets().add(b);
-			} else if (getWeapon() == 2) {
 				float shotangle=playerBot.getGunAngle();
-				float spd = 10f;
-				Bullet b = new Bullet(1);
+				PlasmaBullet b = new PlasmaBullet();
 				b.setPos(playerBot.getX()+(float)Math.cos(shotangle*(Math.PI/180f))*40f, playerBot.getY()-(float)Math.sin(shotangle*(Math.PI/180f))*40f);
-				b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*spd, -(float)Math.sin(shotangle*(Math.PI/180f))*spd);
-				b.setCap(spd, spd);
-				b.setSize(20f);
+				b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
 				b.setAngle(shotangle);
 				b.spawn();
 				gamePanel.getBullets().add(b);
 				shotdelay = 50;
+			} else if (getWeapon() == 2) {
+				float shotangle=playerBot.getGunAngle()+GameUtility.getRnd().nextInt(20)*0.1f-1f;
+				GatlingBullet b = new GatlingBullet();
+				b.setPos(playerBot.getX()+(float)Math.cos(shotangle*(Math.PI/180f))*20f, playerBot.getY()-(float)Math.sin(shotangle*(Math.PI/180f))*20f);
+				b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
+				b.setAngle(shotangle);
+				b.spawn();
+				gamePanel.getBullets().add(b);
 			}
 		}
 		

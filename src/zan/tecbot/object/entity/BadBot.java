@@ -1,4 +1,4 @@
-package zan.tecbot.object;
+package zan.tecbot.object.entity;
 
 import zan.game.object.Shape;
 import zan.game.sprite.AnimatedSprite;
@@ -29,39 +29,48 @@ public class BadBot extends BaseEntity {
 		AnimatedSprite anim = (AnimatedSprite) sprite[1];
 		anim.setAnimation(true, false, 3);
 		
+		setMaxHealth(50f);
 		setCap(2.5f, 10f);
 	}
 	
 	public void update() {
 		AnimatedSprite anim = (AnimatedSprite) sprite[1];
-		moving = false;
-		
-		if (ground) {
-			setDY(-5f);
-			if (GameUtility.getRnd().nextInt(100) == 64) {applyForceY(7f); setDY(0f); ground = false; onground = false;}
-			if (facing == 1) {applyForceX(-0.5f); moving = true;}
-			else if (facing == 0) {applyForceX(0.5f); moving = true;}
+		if (isAlive()) {
+			moving = false;
+			
+			if (ground) {
+				setDY(-5f);
+				if (GameUtility.getRnd().nextInt(100) == 64) {applyForceY(7f); setDY(0f); ground = false; onground = false;}
+				if (facing == 1) {applyForceX(-0.5f); moving = true;}
+				else if (facing == 0) {applyForceX(0.5f); moving = true;}
+			} else {
+				applyForceY(-0.25f);
+				if (facing == 1) {applyForceX(-0.1f);}
+				else if (facing == 0) {applyForceX(0.1f);}
+			}
+			
+			if (GameUtility.getRnd().nextInt(100) == 32) {
+				if (facing == 0) facing = 1;
+				else if (facing == 1) facing = 0;
+			}
+			
+			if (onmoving && !moving) anim.setCurFrame(0);
+			onmoving = moving;
+			ground = false;
 		} else {
 			applyForceY(-0.25f);
-			if (facing == 1) {applyForceX(-0.1f);}
-			else if (facing == 0) {applyForceX(0.1f);}
+			angle = 30f;
 		}
-		
-		if (GameUtility.getRnd().nextInt(100) == 32) {
-			if (facing == 0) facing = 1;
-			else if (facing == 1) facing = 0;
-		}
-		
-		if (onmoving && !moving) anim.setCurFrame(0);
-		onmoving = moving;
-		ground = false;
+		if (getY() < -1000f) despawn();
 		super.update();
 		anim.update();
 	}
 	
 	public void render() {
-		if (moving) sprite[1].render(getX(), getY(), getSize(), 0f, facing, 0.8f);
-		else sprite[0].render(getX(), getY(), getSize(), 0f, facing, 0.8f);
+		if (isAlive()) {
+			if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+			else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
+		} else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.5f);
 		
 		/*glColor4f(1f, 0f, 1f, 1f);
 		super.render();
