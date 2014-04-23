@@ -237,7 +237,7 @@ public class GameCore {
 				if (Display.isVisible() || Display.isDirty()) render();
 				Display.update();
 				
-				if (Mouse.isGrabbed()) Mouse.setGrabbed(false);
+				InputManager.setMouseGrabbed(false);
 			}
 		}
 	}

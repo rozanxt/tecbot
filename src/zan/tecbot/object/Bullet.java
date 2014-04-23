@@ -84,6 +84,30 @@ public class Bullet extends BaseObject {
 			distinrange.remove(next);
 		}
 	}
+	public void EntitiesInRange(ArrayList<Pair> pairs, ArrayList<BaseEntity> entities) {
+		ArrayList<BaseEntity> inrange = new ArrayList<BaseEntity>();
+		ArrayList<Float> distinrange = new ArrayList<Float>();
+		for (int i=0;i<entities.size();i++) {
+			Vector2f dist = Vector2f.sub(getPos(), entities.get(i).getPos(), null);
+			if (dist.lengthSquared() < 2500f) {
+				inrange.add(entities.get(i));
+				distinrange.add(dist.length());
+			}
+		}
+		while (distinrange.size() > 0) {
+			float bestDist = Float.MAX_VALUE;
+			int next = 0;
+			for (int i=0;i<distinrange.size();i++) {
+				if (distinrange.get(i) < bestDist) {
+					bestDist = distinrange.get(i);
+					next = i;
+				}
+			}
+			pairs.add(new Pair(this, inrange.get(next)));
+			inrange.remove(next);
+			distinrange.remove(next);
+		}
+	}
 	
 	public void collide(BaseObject obj, Collision col) {
 		if (hostile) {

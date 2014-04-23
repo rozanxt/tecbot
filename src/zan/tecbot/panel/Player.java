@@ -32,7 +32,7 @@ public class Player {
 		
 		if (InputManager.isButtonDown(0) && shotdelay == 0) {
 			if (getWeapon() == 1) {
-				float shotangle=playerBot.gunangle+GameUtility.getRnd().nextInt(20)*0.1f-1f;
+				float shotangle=playerBot.getGunAngle()+GameUtility.getRnd().nextInt(20)*0.1f-1f;
 				float spd = 20f;
 				Bullet b = new Bullet(0);
 				b.setPos(playerBot.getX()+(float)Math.cos(shotangle*(Math.PI/180f))*20f, playerBot.getY()-(float)Math.sin(shotangle*(Math.PI/180f))*20f);
@@ -43,7 +43,7 @@ public class Player {
 				b.spawn();
 				gamePanel.getBullets().add(b);
 			} else if (getWeapon() == 2) {
-				float shotangle=playerBot.gunangle;
+				float shotangle=playerBot.getGunAngle();
 				float spd = 10f;
 				Bullet b = new Bullet(1);
 				b.setPos(playerBot.getX()+(float)Math.cos(shotangle*(Math.PI/180f))*40f, playerBot.getY()-(float)Math.sin(shotangle*(Math.PI/180f))*40f);

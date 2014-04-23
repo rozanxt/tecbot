@@ -63,14 +63,15 @@ public class InputManager {
 			}
 		}
 		
-		/*if (isKeyPressed(Keyboard.KEY_ESCAPE)) mouseGrab = false;
-		else if (isButtonDown(0)) mouseGrab = true;
-		if (Mouse.isGrabbed() != mouseGrab) Mouse.setGrabbed(mouseGrab);*/
+		if (isKeyPressed(Keyboard.KEY_ESCAPE)) mouseGrab = false;
+		else if (isButtonDown(0) || isButtonDown(1) || isButtonDown(2)) mouseGrab = true;
+		if (Mouse.isGrabbed() != mouseGrab) Mouse.setGrabbed(mouseGrab);
 	}
 	
 	public static ArrayList<MouseEvent> getMouseEvents() {return mouseEvents;}
 	public static ArrayList<Character> getCharEvents() {return charEvents;}
 	
+	public static void setMouseGrabbed(boolean mg) {mouseGrab = mg;}
 	public static boolean isMouseGrabbed() {return mouseGrab;}
 	public static int getMouseX() {return mouseX;}
 	public static int getMouseY() {return mouseY;}

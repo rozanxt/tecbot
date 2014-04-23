@@ -4,6 +4,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 
+import org.lwjgl.input.Mouse;
+
 import zan.game.GameCore;
 import zan.game.input.InputManager;
 import zan.game.object.Collision;
@@ -22,6 +24,7 @@ public class GamePanel implements IPanel {
 	private Player gamePlayer;
 	
 	private Tecbot tecbot;
+	private ArrayList<BaseEntity> entities;
 	private ArrayList<Block> blocks;
 	private ArrayList<Bullet> bullets;
 	private ArrayList<Pair> pairs;
@@ -30,7 +33,7 @@ public class GamePanel implements IPanel {
 		initialized = false;
 		gridMap = null;
 		gamePlayer = null;
-		tecbot = null;
+		entities = new ArrayList<BaseEntity>();
 		blocks = new ArrayList<Block>();
 		bullets = new ArrayList<Bullet>();
 		pairs = new ArrayList<Pair>();
@@ -39,109 +42,134 @@ public class GamePanel implements IPanel {
 	public boolean isInitialized() {return initialized;}
 	
 	public void init() {
-		gridMap = new GridMap();
-		gridMap.createMap(blocks);
-		
 		tecbot = new Tecbot();
 		tecbot.setPos(100f, 200f);
 		tecbot.setSize(100f);
 		tecbot.spawn();
 		
+		gridMap = new GridMap();
+		gridMap.createMap(blocks, entities);
+		
 		gamePlayer = new Player(this, tecbot);
 		
+		InputManager.setMouseGrabbed(true);
 		initialized = true;
 	}
 	
 	public ArrayList<Bullet> getBullets() {return bullets;}
 	
 	public void update() {
-		// Input
-		gamePlayer.input();
-		
-		// Update Objects
-		if (tecbot.isActive()) tecbot.update();
-		for (int i=0;i<bullets.size();i++) {
-			if (i >= bullets.size()) break;
-			if (bullets.get(i).isActive()) bullets.get(i).update();
-			else {bullets.remove(i); i--;}
+		if (InputManager.isMouseGrabbed()) {
+			// Input
+			gamePlayer.input();
+			
+			// Update Objects
+			if (tecbot.isActive()) tecbot.update();
+			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).update();
+			for (int i=0;i<bullets.size();i++) {
+				if (i >= bullets.size()) break;
+				if (bullets.get(i).isActive()) bullets.get(i).update();
+				else {bullets.remove(i); i--;}
+			}
+			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).update();
+			
+			// Create Collision Pairs
+			if (tecbot.isActive()) tecbot.BlocksInRange(pairs, blocks);
+			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).BlocksInRange(pairs, blocks);
+			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) {bullets.get(i).BlocksInRange(pairs, blocks); bullets.get(i).EntitiesInRange(pairs, entities);}
+			
+			// Resolve Collisions
+			for (int i=0;i<pairs.size();i++) Collision.resolveCollision(pairs.get(i).pairA, pairs.get(i).pairB);
+			pairs.clear();
+			
+			// Update Corrections
+			if (tecbot.isActive()) tecbot.correction();
+			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).correction();
+			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).correction();
+			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
 		}
-		for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).update();
-		
-		// Create Collision Pairs
-		if (tecbot.isActive()) tecbot.BlocksInRange(pairs, blocks);
-		for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).BlocksInRange(pairs, blocks);
-		
-		// Resolve Collisions
-		for (int i=0;i<pairs.size();i++) Collision.resolveCollision(pairs.get(i).pairA, pairs.get(i).pairB);
-		pairs.clear();
-		
-		// Update Corrections
-		if (tecbot.isActive()) tecbot.correction();
-		for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).correction();
-		for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
 	}
 	
 	public void render() {
 		CameraPort.viewDynamicCam(tecbot.getX(), tecbot.getY(), 0.4f);
 		for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).render();
 		for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).render();
+		for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).render();
 		if (tecbot.isActive()) tecbot.render();
 		
-		float[] mp = GameCore.ScreenToLogic(InputManager.getMouseX(), InputManager.getMouseY());
-		
-		glDisable(GL_TEXTURE_2D);
-		glPushMatrix();
-		
-		glTranslatef(mp[0], mp[1], 0f);
-		glScalef(3f, 3f, 1f);
-		
-		glColor4f(0f, 1f, 0f, 1f);
-		glBegin(GL_LINES);
-			glVertex2f(-2f, -2f);
-			glVertex2f(-2f, -1f);
+		if (Mouse.isGrabbed()) {
+			float[] mp = GameCore.ScreenToLogic(InputManager.getMouseX(), InputManager.getMouseY());
 			
-			glVertex2f(-2f, 1f);
-			glVertex2f(-2f, 2f);
+			glDisable(GL_TEXTURE_2D);
+			glPushMatrix();
 			
-			glVertex2f(-2f, 2f);
-			glVertex2f(-1f, 2f);
+			glTranslatef(mp[0], mp[1], 0f);
+			glScalef(3f, 3f, 1f);
 			
-			glVertex2f(1f, 2f);
-			glVertex2f(2f, 2f);
+			glColor4f(0f, 1f, 0f, 1f);
+			glBegin(GL_LINES);
+				glVertex2f(-2f, -2f);
+				glVertex2f(-2f, -1f);
+				
+				glVertex2f(-2f, 1f);
+				glVertex2f(-2f, 2f);
+				
+				glVertex2f(-2f, 2f);
+				glVertex2f(-1f, 2f);
+				
+				glVertex2f(1f, 2f);
+				glVertex2f(2f, 2f);
+				
+				glVertex2f(2f, 2f);
+				glVertex2f(2f, 1f);
+				
+				glVertex2f(2f, -1f);
+				glVertex2f(2f, -2f);
+				
+				glVertex2f(2f, -2f);
+				glVertex2f(1f, -2f);
+				
+				glVertex2f(-1f, -2f);
+				glVertex2f(-2f, -2f);
+				
+				glVertex2f(-3f, 0f);
+				glVertex2f(-1.5f, 0f);
+				
+				glVertex2f(0f, 3f);
+				glVertex2f(0f, 1.5f);
+				
+				glVertex2f(3f, 0f);
+				glVertex2f(1.5f, 0f);
+				
+				glVertex2f(0f, -3f);
+				glVertex2f(0f, -1.5f);
+			glEnd();
+			glColor4f(1f, 1f, 1f, 1f);
 			
-			glVertex2f(2f, 2f);
-			glVertex2f(2f, 1f);
-			
-			glVertex2f(2f, -1f);
-			glVertex2f(2f, -2f);
-			
-			glVertex2f(2f, -2f);
-			glVertex2f(1f, -2f);
-			
-			glVertex2f(-1f, -2f);
-			glVertex2f(-2f, -2f);
-			
-			glVertex2f(-3f, 0f);
-			glVertex2f(-1.5f, 0f);
-			
-			glVertex2f(0f, 3f);
-			glVertex2f(0f, 1.5f);
-			
-			glVertex2f(3f, 0f);
-			glVertex2f(1.5f, 0f);
-			
-			glVertex2f(0f, -3f);
-			glVertex2f(0f, -1.5f);
-		glEnd();
-		glColor4f(1f, 1f, 1f, 1f);
-		
-		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);
+			glPopMatrix();
+			glEnable(GL_TEXTURE_2D);
+		}
 		
 		CameraPort.viewGUI();
 		TextManager.renderText("FPS: " + GameCore.getFPS(), "defont", 5f, GameCore.GAME_HEIGHT - 5f, 10f, 6);
-		TextManager.renderText("Gun Angle: " + tecbot.gunangle, "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
+		TextManager.renderText("Gun Angle: " + tecbot.getGunAngle(), "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
 		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
+		
+		if (!Mouse.isGrabbed()) {
+			glDisable(GL_TEXTURE_2D);
+			glColor4f(0f, 0f, 0f, 0.5f);
+			glBegin(GL_QUADS);
+				glVertex2f(0f, 0f);
+				glVertex2f(0f, GameCore.SCR_HEIGHT);
+				glVertex2f(GameCore.SCR_WIDTH, GameCore.SCR_HEIGHT);
+				glVertex2f(GameCore.SCR_WIDTH, 0f);
+			glEnd();
+			glEnable(GL_TEXTURE_2D);
+			
+			glColor4f(0f, 0.6f, 0.8f, 1f);
+			TextManager.renderText("Click to resume game...", "defont", GameCore.GAME_HEIGHT*GameCore.getScreenRatio()/2f, GameCore.GAME_HEIGHT/2f, 12f, 1);
+			glColor4f(1f, 1f, 1f, 1f);
+		}
 	}
 	
 }

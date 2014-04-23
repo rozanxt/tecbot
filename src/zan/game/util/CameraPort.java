@@ -25,18 +25,20 @@ public class CameraPort {
 	}
 	
 	public static void viewDynamicCam(float sx, float sy, float factor) {
-		float vx = sx-(GameCore.GAME_WIDTH/2f)-GameCore.ScreenToLogic(GameCore.getScreenCrop()[0], GameCore.getScreenCrop()[1])[0];
-		float vy = sy-(GameCore.GAME_HEIGHT/2f);
 		float vw = GameCore.GAME_HEIGHT*GameCore.getScreenRatio();
 		float vh = GameCore.GAME_HEIGHT;
 		
-		float ox = (InputManager.getMouseX()-(GameCore.SCR_WIDTH/2f))*factor;
-		float oy = (InputManager.getMouseY()-(GameCore.SCR_HEIGHT/2f))*factor;
-		
-		//if (Math.abs(ox) > 200f) ox = ox*200f/Math.abs(ox);
-		//if (Math.abs(oy) > 150f) oy = oy*150f/Math.abs(oy);
-		
-		dcam_x = -vx-ox; dcam_y = -vy-oy;
+		if (InputManager.isMouseGrabbed()) {
+			float vx = sx-(GameCore.GAME_WIDTH/2f)-GameCore.ScreenToLogic(GameCore.getScreenCrop()[0], GameCore.getScreenCrop()[1])[0];
+			float vy = sy-(GameCore.GAME_HEIGHT/2f);
+			float ox = (InputManager.getMouseX()-(GameCore.SCR_WIDTH/2f))*factor;
+			float oy = (InputManager.getMouseY()-(GameCore.SCR_HEIGHT/2f))*factor;
+			
+			//if (Math.abs(ox) > 200f) ox = ox*200f/Math.abs(ox);
+			//if (Math.abs(oy) > 150f) oy = oy*150f/Math.abs(oy);
+			
+			dcam_x += ((-vx-ox)-dcam_x)*0.1f; dcam_y += ((-vy-oy)-dcam_y)*0.1f;
+		}
 		
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
