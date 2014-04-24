@@ -35,9 +35,9 @@ public class PlasmaBullet extends Bullet {
 		shape.fix();
 		hitTime = 0;
 		alpha = 1f;
-		setSize(20f);
+		setSize(10f);
 		setSpeed(10f);
-		setDamage(30f);
+		setDamage(10f);
 		setRange(800f);
 		setCap(getSpeed(), getSpeed());
 	}
@@ -53,7 +53,6 @@ public class PlasmaBullet extends Bullet {
 	public void update() {
 		super.update();
 		if (!hostile) {
-			setSize(40f-hitTime);
 			alpha = hitTime/20f;
 			if (hitTime > 0) hitTime --;
 			else despawn();
@@ -65,10 +64,12 @@ public class PlasmaBullet extends Bullet {
 		glPushMatrix();
 		
 		glTranslatef(pos.x, pos.y, 0f);
-		glScalef(size, size, 0f);
+		if (!hostile) glScalef(size+(20f-hitTime), size+(20f-hitTime), 0f);
+		else glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		glColor4f(0f, 1f, 1f, alpha);
+		if (getDamage() > 25f) glColor4f(1f, 0.5f, 0f, alpha);
+		else glColor4f(0f, 1f, 1f, alpha);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {
 				Vector2f vertex = shape.getPoint(i);

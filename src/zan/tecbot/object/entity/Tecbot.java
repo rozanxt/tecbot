@@ -58,11 +58,18 @@ public class Tecbot extends BaseEntity {
 	public boolean collide(BaseObject obj, Collision col) {
 		if (super.collide(obj, col)) {
 			if (invulnerable == 0 && obj instanceof BadBot) {
+				BadBot entity = (BadBot)obj;
 				Vector2f norm = col.normal;
+				Vector2f negnorm = new Vector2f();
+				norm.negate(negnorm);
 				setDY(0f);
 				applyForce(norm.x*10f, 4f);
 				ground = false;
 				onground = false;
+				if (entity.isStompAble() && col.normFriction() && norm.y > 0f) {
+					entity.stomp();
+					return true;
+				}
 				inflictDamage(20f);
 				invulnerable = 50;
 			}

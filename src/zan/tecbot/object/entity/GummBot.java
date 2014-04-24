@@ -43,6 +43,7 @@ public class GummBot extends BadBot {
 		
 		setMaxHealth(50f);
 		setCap(2.5f, 10f);
+		stompAble = true;
 		turnOnEdge = true;
 		jumpOnEdge = true;
 		turnFlag = 0;

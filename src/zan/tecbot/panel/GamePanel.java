@@ -79,6 +79,8 @@ public class GamePanel implements IPanel {
 			else {
 				tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
 				tecbot.spawn();
+				GatlingGun gg = (GatlingGun)gamePlayer.weapons[2];
+				gg.addAmmo(500);
 			}
 			for (int i=0;i<entities.size();i++) {
 				if (i >= entities.size()) break;
@@ -209,6 +211,13 @@ public class GamePanel implements IPanel {
 		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
 		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
 		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);
+		TextManager.renderText("Energy: " + gamePlayer.energy + " / " + gamePlayer.maxEnergy, "defont", 5f, GameCore.GAME_HEIGHT - 55f, 10f, 6);
+		PlasmaCannon pc = (PlasmaCannon)gamePlayer.weapons[1];
+		TextManager.renderText("Load: " + pc.energyLoad, "defont", 5f, GameCore.GAME_HEIGHT - 65f, 10f, 6);
+		GatlingGun gg = (GatlingGun)gamePlayer.weapons[2];
+		if (gg.burnout > 0) glColor4f(1f, 0f, 0f, 0.8f);
+		TextManager.renderText("Ammo: " + gg.getAmmo() + " / " + gg.getMaxAmmo(), "defont", 5f, GameCore.GAME_HEIGHT - 75f, 10f, 6);
+		glColor4f(1f, 1f, 1f, 1f);
 		
 		if (!Mouse.isGrabbed()) {
 			glDisable(GL_TEXTURE_2D);
