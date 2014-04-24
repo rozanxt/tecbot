@@ -62,6 +62,12 @@ public class GamePanel implements IPanel {
 	
 	public Tecbot getTecbot() {return tecbot;}
 	public ArrayList<Bullet> getBullets() {return bullets;}
+	public Block getBlock(int sx, int sy) {
+		for (int i=0;i<blocks.size();i++) {
+			if (blocks.get(i).getTileX() == sx && blocks.get(i).getTileY() == sy) return blocks.get(i);
+		}
+		return null;
+	}
 	
 	public void update() {
 		if (InputManager.isMouseGrabbed()) {
@@ -87,9 +93,44 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).update();
 			
 			// Create Collision Pairs
-			if (tecbot.isActive()) {tecbot.BlocksInRange(pairs, blocks); tecbot.EntitiesInRange(pairs, entities);}
-			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).BlocksInRange(pairs, blocks);
-			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) {bullets.get(i).BlocksInRange(pairs, blocks); bullets.get(i).EntitiesInRange(pairs, entities);}
+			ArrayList<Block> hlb = new ArrayList<Block>();
+			if (tecbot.isActive()) {
+				tecbot.BlocksInRange(pairs, blocks);
+				tecbot.EntitiesInRange(pairs, entities);
+				Block b = getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-1);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-2);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-1);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-2);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-1);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-2);
+				if (b != null) hlb.add(b);
+			}
+			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) {
+				entities.get(i).BlocksInRange(pairs, blocks);
+				Block b = getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-1);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-2);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-1);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-2);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-1);
+				if (b != null) hlb.add(b);
+				b = getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-2);
+				if (b != null) hlb.add(b);
+			}
+			for (int i=0;i<hlb.size();i++) hlb.get(i).highlight();
+			hlb.clear();
+			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) {
+				bullets.get(i).BlocksInRange(pairs, blocks);
+				bullets.get(i).EntitiesInRange(pairs, entities);
+			}
 			
 			// Resolve Collisions
 			for (int i=0;i<pairs.size();i++) Collision.resolveCollision(pairs.get(i).pairA, pairs.get(i).pairB);
@@ -103,7 +144,7 @@ public class GamePanel implements IPanel {
 		}
 	}
 	
-	public void render() {
+	public void render() {		
 		CameraPort.viewDynamicCam(tecbot.getX(), tecbot.getY(), 0.4f);
 		for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).render();
 		for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).render();
@@ -164,7 +205,7 @@ public class GamePanel implements IPanel {
 		
 		CameraPort.viewGUI();
 		TextManager.renderText("FPS: " + GameCore.getFPS(), "defont", 5f, GameCore.GAME_HEIGHT - 5f, 10f, 6);
-		TextManager.renderText("Mouse Position: " + mp[0] + " " + mp[1], "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
+		TextManager.renderText("Mouse Position: " + GridMap.getTileX(mp[0]) + " " + GridMap.getTileY(mp[1]), "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
 		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
 		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
 		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);

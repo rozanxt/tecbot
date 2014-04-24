@@ -8,12 +8,21 @@ import zan.game.object.BaseObject;
 
 public abstract class Block extends BaseObject {
 	
+	protected int tileX, tileY;
 	protected boolean highlight;
 	
-	public Block() {
+	public Block(int sx, int sy) {
 		super();
+		tileX = sx;
+		tileY = sy;
 		highlight = false;
 	}
+	
+	public void setTilePos(int sx, int sy) {tileX = sx; tileY = sy;}
+	public void setTileX(int sx) {tileX = sx;}
+	public void setTileY(int sy) {tileY = sy;}
+	public int getTileX() {return tileX;}
+	public int getTileY() {return tileY;}
 	
 	public void highlight() {highlight = true;}
 	

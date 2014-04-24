@@ -66,6 +66,7 @@ public class Tecbot extends BaseEntity {
 				inflictDamage(20f);
 				invulnerable = 50;
 			}
+			return true;
 		}
 		return false;
 	}

@@ -6,8 +6,8 @@ public class SolidBlock extends Block {
 	
 	protected int type;
 	
-	public SolidBlock(int st) {
-		super();
+	public SolidBlock(int sx, int sy, int st) {
+		super(sx, sy);
 		type = st;
 		shape = new Shape();
 		if (type == 1) {

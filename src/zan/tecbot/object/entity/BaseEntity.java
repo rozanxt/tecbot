@@ -55,7 +55,7 @@ public abstract class BaseEntity extends BaseObject {
 			for (int i=0;i<blocks.size();i++) {
 				Vector2f dist = Vector2f.sub(getPos(), blocks.get(i).getPos(), null);
 				if (dist.lengthSquared() < 10000f) {
-					blocks.get(i).highlight();
+					//blocks.get(i).highlight();
 					inrange.add(blocks.get(i));
 					distinrange.add(dist.length());
 				}

@@ -9,8 +9,8 @@ import zan.tecbot.object.entity.BaseEntity;
 
 public class BumperBlock extends Block {
 	
-	public BumperBlock() {
-		super();
+	public BumperBlock(int sx, int sy) {
+		super(sx, sy);
 		shape = new Shape();
 		shape.addPoint(0f, 0f);
 		shape.addPoint(0f, 1.2f);
