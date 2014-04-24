@@ -10,8 +10,8 @@ import zan.game.sprite.ISprite;
 import zan.game.sprite.Sprite;
 import zan.game.sprite.SpriteManager;
 import zan.game.util.GameUtility;
+import zan.tecbot.mechanism.GridMap;
 import zan.tecbot.object.block.Block;
-import zan.tecbot.panel.GridMap;
 
 public class GummBot extends BadBot {
 	

@@ -13,10 +13,13 @@ import zan.game.object.Pair;
 import zan.game.panel.IPanel;
 import zan.game.sprite.TextManager;
 import zan.game.util.CameraPort;
+import zan.tecbot.mechanism.GridMap;
+import zan.tecbot.mechanism.Player;
 import zan.tecbot.object.block.Block;
 import zan.tecbot.object.bullet.Bullet;
 import zan.tecbot.object.entity.BaseEntity;
 import zan.tecbot.object.entity.Tecbot;
+import zan.tecbot.resource.MapReader;
 
 public class GamePanel implements IPanel {
 	
@@ -79,8 +82,7 @@ public class GamePanel implements IPanel {
 			else {
 				tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
 				tecbot.spawn();
-				GatlingGun gg = (GatlingGun)gamePlayer.weapons[2];
-				gg.addAmmo(500);
+				gamePlayer.addAmmo(500);
 			}
 			for (int i=0;i<entities.size();i++) {
 				if (i >= entities.size()) break;
@@ -92,7 +94,11 @@ public class GamePanel implements IPanel {
 				if (bullets.get(i).isActive()) bullets.get(i).update();
 				else {bullets.remove(i); i--;}
 			}
-			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).update();
+			for (int i=0;i<blocks.size();i++) {
+				if (i >= blocks.size()) break;
+				if (blocks.get(i).isActive()) blocks.get(i).update();
+				else {blocks.remove(i); i--;}
+			}
 			
 			// Create Collision Pairs
 			ArrayList<Block> hlb = new ArrayList<Block>();
@@ -211,12 +217,10 @@ public class GamePanel implements IPanel {
 		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
 		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
 		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);
-		TextManager.renderText("Energy: " + gamePlayer.energy + " / " + gamePlayer.maxEnergy, "defont", 5f, GameCore.GAME_HEIGHT - 55f, 10f, 6);
-		PlasmaCannon pc = (PlasmaCannon)gamePlayer.weapons[1];
-		TextManager.renderText("Load: " + pc.energyLoad, "defont", 5f, GameCore.GAME_HEIGHT - 65f, 10f, 6);
-		GatlingGun gg = (GatlingGun)gamePlayer.weapons[2];
-		if (gg.burnout > 0) glColor4f(1f, 0f, 0f, 0.8f);
-		TextManager.renderText("Ammo: " + gg.getAmmo() + " / " + gg.getMaxAmmo(), "defont", 5f, GameCore.GAME_HEIGHT - 75f, 10f, 6);
+		TextManager.renderText("Energy: " + gamePlayer.getEnergy() + " / " + gamePlayer.getMaxEnergy(), "defont", 5f, GameCore.GAME_HEIGHT - 55f, 10f, 6);
+		TextManager.renderText("Load: " + gamePlayer.getEnergyLoad(), "defont", 5f, GameCore.GAME_HEIGHT - 65f, 10f, 6);
+		if (gamePlayer.isBurnedOut()) glColor4f(1f, 0f, 0f, 0.8f);
+		TextManager.renderText("Ammo: " + gamePlayer.getAmmo() + " / " + gamePlayer.getMaxAmmo(), "defont", 5f, GameCore.GAME_HEIGHT - 75f, 10f, 6);
 		glColor4f(1f, 1f, 1f, 1f);
 		
 		if (!Mouse.isGrabbed()) {

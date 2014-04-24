@@ -1,4 +1,4 @@
-package zan.tecbot.object.bullet;
+package zan.tecbot.object.block;
 
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -16,46 +16,30 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import zan.game.object.BaseObject;
-import zan.game.object.Collision;
 import zan.game.object.Shape;
 
-public class PlasmaBullet extends Bullet {
+public class DestroyAbleBlock extends Block {
 	
-	protected int hitTime;
-	protected float alpha;
+	protected float health;
 	
-	public PlasmaBullet() {
-		super();
+	public DestroyAbleBlock(int sx, int sy) {
+		super(sx, sy);
 		shape = new Shape();
-		for (int i=0;i<12;i++) {
-			float angle = (float)(-i*30f*Math.PI/180f);
-			shape.addPoint((float)(0.5f+0.5f*Math.cos(angle)), (float)(0.5f+0.5f*Math.sin(angle)));
-		}
+		shape.addPoint(0f, 0f);
+		shape.addPoint(0f, 1f);
+		shape.addPoint(1f, 1f);
+		shape.addPoint(1f, 0f);
 		shape.fix();
-		hitTime = 0;
-		alpha = 1f;
-		setSize(10f);
-		setSpeed(10f);
-		setDamage(10f);
-		setRange(800f);
-		setCap(getSpeed(), getSpeed());
+		health = 20f;
 	}
 	
-	public boolean collide(BaseObject obj, Collision col) {
-		if (super.collide(obj, col)) {
-			hitTime = 20;
-			return true;
-		}
-		return false;
-	}
+	public void inflictDamage(float dmg) {health -= dmg;}
 	
 	public void update() {
 		super.update();
-		if (!hostile) {
-			alpha = hitTime/20f;
-			if (hitTime > 0) hitTime --;
-			else despawn();
+		if (health <= 0f) {
+			health = 0f;
+			despawn();
 		}
 	}
 	
@@ -64,12 +48,11 @@ public class PlasmaBullet extends Bullet {
 		glPushMatrix();
 		
 		glTranslatef(pos.x, pos.y, 0f);
-		if (!hostile) glScalef(size+(20f-hitTime), size+(20f-hitTime), 0f);
-		else glScalef(size, size, 0f);
+		glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		if (getDamage() >= 40f) glColor4f(1f, 0.5f, 0f, alpha);
-		else glColor4f(0f, 1f, 1f, alpha);
+		if (highlight) glColor4f(1f, 0f, 0f, 1f);
+		else glColor4f(0.6f, 0.3f, 0f, 1f);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {
 				Vector2f vertex = shape.getPoint(i);

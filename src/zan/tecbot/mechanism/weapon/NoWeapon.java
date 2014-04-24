@@ -1,4 +1,6 @@
-package zan.tecbot.panel;
+package zan.tecbot.mechanism.weapon;
+
+import zan.tecbot.mechanism.Player;
 
 public class NoWeapon extends Weapon {
 	

@@ -8,6 +8,7 @@ import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Pair;
 import zan.tecbot.object.block.Block;
+import zan.tecbot.object.block.DestroyAbleBlock;
 import zan.tecbot.object.entity.BadBot;
 import zan.tecbot.object.entity.BaseEntity;
 
@@ -49,6 +50,10 @@ public class Bullet extends BaseObject {
 		if (hostile) {
 			if (obj instanceof BadBot) {
 				BadBot entity = (BadBot)obj;
+				entity.inflictDamage(damage);
+			}
+			if (obj instanceof DestroyAbleBlock) {
+				DestroyAbleBlock entity = (DestroyAbleBlock)obj;
 				entity.inflictDamage(damage);
 			}
 			Vector2f norm = new Vector2f();

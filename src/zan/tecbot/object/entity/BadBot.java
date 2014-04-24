@@ -13,7 +13,7 @@ public abstract class BadBot extends BaseEntity {
 	public boolean isStompAble() {return stompAble;}
 	
 	public void stomp() {
-		inflictDamage(40f);
+		inflictDamage(30f);
 	}
 	
 }

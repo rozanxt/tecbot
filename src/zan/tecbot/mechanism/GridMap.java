@@ -1,4 +1,4 @@
-package zan.tecbot.panel;
+package zan.tecbot.mechanism;
 
 import java.util.ArrayList;
 
@@ -31,7 +31,7 @@ public class GridMap {
 	
 	public static boolean isSolidBlock(int sx, int sy) {
 		char code = mapData.charAt(sx+(mapHeight-sy-1)*mapWidth);
-		if (code == '0' || code == '1' || code == '2' || code == '3' || code == '4' || code == '5') return true;
+		if (code == '0' || code == '1' || code == '2' || code == '3' || code == '4' || code == '5' || code == 'O') return true;
 		return false;
 	}
 	
@@ -81,6 +81,12 @@ public class GridMap {
 					blocks.add(block);
 				} else if (code == '5') {
 					BumperBlock block = new BumperBlock(i, mapHeight-j-1);
+					block.setPos(tx, ty);
+					block.setSize(tileSize);
+					block.spawn();
+					blocks.add(block);
+				} else if (code == 'O') {
+					DestroyAbleBlock block = new DestroyAbleBlock(i, mapHeight-j-1);
 					block.setPos(tx, ty);
 					block.setSize(tileSize);
 					block.spawn();

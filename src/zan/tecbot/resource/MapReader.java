@@ -1,4 +1,4 @@
-package zan.tecbot.panel;
+package zan.tecbot.resource;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

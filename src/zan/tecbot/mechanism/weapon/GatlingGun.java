@@ -1,6 +1,7 @@
-package zan.tecbot.panel;
+package zan.tecbot.mechanism.weapon;
 
 import zan.game.util.GameUtility;
+import zan.tecbot.mechanism.Player;
 import zan.tecbot.object.bullet.GatlingBullet;
 
 public class GatlingGun extends Weapon {
@@ -23,8 +24,13 @@ public class GatlingGun extends Weapon {
 	public int getAmmo() {return ammo;}
 	public int getMaxAmmo() {return maxAmmo;}
 	
+	public boolean isBurnedOut() {
+		if (burnout > 0) return true;
+		return false;
+	}
+	
 	public void update() {
-		if (burnout > 0) burnout--;
+		if (isBurnedOut()) burnout--;
 	}
 	
 	public void trigger() {}
@@ -32,18 +38,18 @@ public class GatlingGun extends Weapon {
 	public void release() {}
 	
 	public void onTrigger() {
-		if (burnout == 0 && ammo > 0) {
-			float shotangle=user.gamePanel.getTecbot().getGunAngle()+GameUtility.getRnd().nextInt(20)*0.1f-1f;
+		if (!isBurnedOut() && ammo > 0) {
+			float shotangle=user.getTecbot().getGunAngle()+GameUtility.getRnd().nextInt(20)*0.1f-1f;
 			GatlingBullet b = new GatlingBullet();
-			b.setPos(user.gamePanel.getTecbot().getX()+(float)Math.cos(shotangle*(Math.PI/180f))*20f, user.gamePanel.getTecbot().getY()-(float)Math.sin(shotangle*(Math.PI/180f))*20f);
+			b.setPos(user.getTecbot().getX()+(float)Math.cos(shotangle*(Math.PI/180f))*20f, user.getTecbot().getY()-(float)Math.sin(shotangle*(Math.PI/180f))*20f);
 			b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
 			b.setAngle(shotangle);
 			b.spawn();
-			user.gamePanel.getBullets().add(b);
+			user.getBullets().add(b);
 			ammo--;
 			
-			user.drainEnergy(1f);
-			if (user.energy == 0f) burnout = 200;
+			user.drainEnergy(0.5f);
+			if (user.getEnergy() == 0f) burnout = 200;
 		} else user.regEnergy();
 	}
 	
