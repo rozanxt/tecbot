@@ -20,6 +20,9 @@ public class Tecbot extends BaseEntity {
 	
 	protected ISprite[] sprite;
 	
+	protected int flpani;
+	protected float flpcnt;
+	
 	protected int invulnerable;
 	
 	protected float gunangle;
@@ -44,6 +47,8 @@ public class Tecbot extends BaseEntity {
 		
 		setMaxHealth(100f);
 		setCap(4f, 10f);
+		flpani = 0;
+		flpcnt = 0f;
 		invulnerable = 0;
 		gunangle = 0f;
 	}
@@ -54,6 +59,8 @@ public class Tecbot extends BaseEntity {
 	}
 	
 	public float getGunAngle() {return gunangle;}
+	
+	public void fullyLoadedPlasma(float ss) {flpcnt = ss;}
 	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (super.collide(obj, col)) {
@@ -82,6 +89,23 @@ public class Tecbot extends BaseEntity {
 		AnimatedSprite anim = (AnimatedSprite) sprite[1];
 		moving = false;
 		if (isAlive()) {
+			// QUICK FIX
+			float ox = InputManager.getMouseX()-(GameCore.SCR_WIDTH/2f);
+			float oy = InputManager.getMouseY()-(GameCore.SCR_HEIGHT/2f);
+			
+			if (ox > 0f) {
+				if (oy > 0f) gunangle = 360f-(float)(Math.atan(oy/ox)*(180f/Math.PI));
+				else if (oy < 0f) gunangle = -(float)(Math.atan(oy/ox)*(180f/Math.PI));
+				else gunangle = 0f;
+				facing = 0;
+			} else if (ox < 0f) {
+				gunangle = 180f-(float)(Math.atan(oy/ox)*(180f/Math.PI));
+				facing = 1;
+			} else {
+				if (oy > 0f) gunangle = -90f;
+				else if (oy < 0f) gunangle = 90f;
+			}
+			
 			if (ground) {
 				setDY(-5f);
 				if (InputManager.isKeyDown(Keyboard.KEY_W)) {
@@ -106,35 +130,38 @@ public class Tecbot extends BaseEntity {
 			angle = 30f;
 		}
 		if (invulnerable > 0) invulnerable--;
-		if (getY() < -1000f) {
-			if (isAlive()) inflictDamage(3f);
-			else despawn();
-		}
 		ground = false;
 		super.update();
 		anim.update();
 		
-		if (isAlive()) {
-			// QUICK FIX
-			float ox = InputManager.getMouseX()-(GameCore.SCR_WIDTH/2f);
-			float oy = InputManager.getMouseY()-(GameCore.SCR_HEIGHT/2f);
-			
-			if (ox > 0f) {
-				if (oy > 0f) gunangle = 360f-(float)(Math.atan(oy/ox)*(180f/Math.PI));
-				else if (oy < 0f) gunangle = -(float)(Math.atan(oy/ox)*(180f/Math.PI));
-				else gunangle = 0f;
-				facing = 0;
-			} else if (ox < 0f) {
-				gunangle = 180f-(float)(Math.atan(oy/ox)*(180f/Math.PI));
-				facing = 1;
-			} else {
-				if (oy > 0f) gunangle = -90f;
-				else if (oy < 0f) gunangle = 90f;
-			}
+		if (flpcnt > 0f) {
+			flpani++;
+			if (flpani >= 20) flpani = 0;
 		}
 	}
 	
 	public void render() {
+		if (isAlive() && flpcnt > 0f) {
+			glDisable(GL_TEXTURE_2D);
+			glPushMatrix();
+			
+			glTranslatef(pos.x, pos.y, 0f);
+			glScalef(flpcnt*0.4f, flpcnt*0.4f, 0f);
+			glRotatef(flpani*18f, 0f, 0f, 1f);
+			
+			glColor4f(1f, 0f, 0f, 1f);
+			glBegin(GL_LINE_LOOP);
+				glVertex2f(-1f, -1f);
+				glVertex2f(-1f, 1f);
+				glVertex2f(1f, 1f);
+				glVertex2f(1f, -1f);
+			glEnd();
+			glColor4f(1f, 1f, 1f, 1f);
+			
+			glPopMatrix();
+			glEnable(GL_TEXTURE_2D);
+		}
+		
 		if (isAlive()) {
 			if (invulnerable > 0) {
 				if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 0.75f);

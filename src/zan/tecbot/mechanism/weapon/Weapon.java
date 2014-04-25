@@ -1,12 +1,17 @@
 package zan.tecbot.mechanism.weapon;
 
+import java.util.ArrayList;
+
 import zan.tecbot.mechanism.Player;
+import zan.tecbot.object.bullet.Bullet;
 
 public abstract class Weapon {
 	
+	protected ArrayList<Bullet> bullets;
 	protected Player user;
 	
-	public Weapon(Player su) {
+	public Weapon(ArrayList<Bullet> sb, Player su) {
+		bullets = sb;
 		user = su;
 	}
 	

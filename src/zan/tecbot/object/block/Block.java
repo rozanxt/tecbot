@@ -9,14 +9,18 @@ import zan.game.object.BaseObject;
 public abstract class Block extends BaseObject {
 	
 	protected int tileX, tileY;
+	protected boolean solid;
 	protected boolean highlight;
 	
 	public Block(int sx, int sy) {
 		super();
 		tileX = sx;
 		tileY = sy;
+		solid = false;
 		highlight = false;
 	}
+	
+	public boolean isSolid() {return solid;}
 	
 	public void setTilePos(int sx, int sy) {tileX = sx; tileY = sy;}
 	public void setTileX(int sx) {tileX = sx;}

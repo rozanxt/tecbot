@@ -8,6 +8,7 @@ import org.lwjgl.input.Mouse;
 
 import zan.game.GameCore;
 import zan.game.input.InputManager;
+import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Pair;
 import zan.game.panel.IPanel;
@@ -17,6 +18,7 @@ import zan.tecbot.mechanism.GridMap;
 import zan.tecbot.mechanism.Player;
 import zan.tecbot.object.block.Block;
 import zan.tecbot.object.bullet.Bullet;
+import zan.tecbot.object.collectible.Collectible;
 import zan.tecbot.object.entity.BaseEntity;
 import zan.tecbot.object.entity.Tecbot;
 import zan.tecbot.resource.MapReader;
@@ -33,6 +35,7 @@ public class GamePanel implements IPanel {
 	private ArrayList<BaseEntity> entities;
 	private ArrayList<Block> blocks;
 	private ArrayList<Bullet> bullets;
+	private ArrayList<Collectible> collectibles;
 	private ArrayList<Pair> pairs;
 	
 	public GamePanel() {
@@ -43,6 +46,7 @@ public class GamePanel implements IPanel {
 		entities = new ArrayList<BaseEntity>();
 		blocks = new ArrayList<Block>();
 		bullets = new ArrayList<Bullet>();
+		collectibles = new ArrayList<Collectible>();
 		pairs = new ArrayList<Pair>();
 	}
 	
@@ -51,25 +55,14 @@ public class GamePanel implements IPanel {
 	public void init() {
 		MapReader mapReader = new MapReader("map0.lgm");
 		gridMap = new GridMap(mapReader.getMapData(), mapReader.getMapWidth(), mapReader.getMapHeight());
-		gridMap.createMap(blocks, entities);
-		
 		tecbot = new Tecbot();
-		tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
-		tecbot.spawn();
+		gamePlayer = new Player(tecbot, bullets);
 		
-		gamePlayer = new Player(this);
+		gridMap.createMap(gamePlayer, blocks, entities, bullets, collectibles);
+		gamePlayer.respawn();
 		
 		InputManager.setMouseGrabbed(true);
 		initialized = true;
-	}
-	
-	public Tecbot getTecbot() {return tecbot;}
-	public ArrayList<Bullet> getBullets() {return bullets;}
-	public Block getBlock(int sx, int sy) {
-		for (int i=0;i<blocks.size();i++) {
-			if (blocks.get(i).getTileX() == sx && blocks.get(i).getTileY() == sy) return blocks.get(i);
-		}
-		return null;
 	}
 	
 	public void update() {
@@ -79,11 +72,8 @@ public class GamePanel implements IPanel {
 			
 			// Update Objects
 			if (tecbot.isActive()) tecbot.update();
-			else {
-				tecbot.setPos(gridMap.getPlayerSpawn().getX(), gridMap.getPlayerSpawn().getY());
-				tecbot.spawn();
-				gamePlayer.addAmmo(500);
-			}
+			else gamePlayer.respawn();
+			
 			for (int i=0;i<entities.size();i++) {
 				if (i >= entities.size()) break;
 				if (entities.get(i).isActive()) entities.get(i).update();
@@ -97,47 +87,57 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<blocks.size();i++) {
 				if (i >= blocks.size()) break;
 				if (blocks.get(i).isActive()) blocks.get(i).update();
-				else {blocks.remove(i); i--;}
+				else {
+					gridMap.removeBlock(blocks.get(i).getTileX(), blocks.get(i).getTileY());
+					blocks.remove(i); i--;
+				}
+			}
+			for (int i=0;i<collectibles.size();i++) {
+				if (i >= collectibles.size()) break;
+				if (collectibles.get(i).isActive()) collectibles.get(i).update();
+				else {collectibles.remove(i); i--;}
 			}
 			
 			// Create Collision Pairs
 			ArrayList<Block> hlb = new ArrayList<Block>();
 			if (tecbot.isActive()) {
-				tecbot.BlocksInRange(pairs, blocks);
-				tecbot.EntitiesInRange(pairs, entities);
-				Block b = getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-1);
+				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(blocks));
+				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(entities));
+				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(bullets));
+				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(collectibles));
+				Block b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-1);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-2);
+				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-2);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-1);
+				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-1);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-2);
+				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-2);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-1);
+				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-1);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-2);
+				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-2);
 				if (b != null) hlb.add(b);
 			}
 			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) {
-				entities.get(i).BlocksInRange(pairs, blocks);
-				Block b = getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-1);
+				entities.get(i).ObjectsInRange(pairs, new ArrayList<BaseObject>(blocks));
+				entities.get(i).ObjectsInRange(pairs, new ArrayList<BaseObject>(bullets));
+				Block b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-1);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-2);
+				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-2);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-1);
+				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-1);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-2);
+				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-2);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-1);
+				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-1);
 				if (b != null) hlb.add(b);
-				b = getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-2);
+				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-2);
 				if (b != null) hlb.add(b);
 			}
 			for (int i=0;i<hlb.size();i++) hlb.get(i).highlight();
 			hlb.clear();
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) {
-				bullets.get(i).BlocksInRange(pairs, blocks);
-				bullets.get(i).EntitiesInRange(pairs, entities);
+				bullets.get(i).ObjectsInRange(pairs, new ArrayList<BaseObject>(blocks));
 			}
 			
 			// Resolve Collisions
@@ -149,6 +149,7 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).correction();
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).correction();
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
+			for (int i=0;i<collectibles.size();i++) if (collectibles.get(i).isActive()) collectibles.get(i).correction();
 		}
 	}
 	
@@ -157,6 +158,7 @@ public class GamePanel implements IPanel {
 		for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).render();
 		for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).render();
 		for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) entities.get(i).render();
+		for (int i=0;i<collectibles.size();i++) if (collectibles.get(i).isActive()) collectibles.get(i).render();
 		if (tecbot.isActive()) tecbot.render();
 		
 		float[] mp = GameCore.ScreenToLogic(InputManager.getMouseX(), InputManager.getMouseY());

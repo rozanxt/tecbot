@@ -1,10 +1,13 @@
 package zan.tecbot.mechanism.weapon;
 
+import java.util.ArrayList;
+
 import zan.tecbot.mechanism.Player;
+import zan.tecbot.object.bullet.Bullet;
 
 public class NoWeapon extends Weapon {
 	
-	public NoWeapon(Player su) {super(su);}
+	public NoWeapon(ArrayList<Bullet> sb, Player su) {super(sb, su);}
 	
 	public void update() {}
 	public void trigger() {}

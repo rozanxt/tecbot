@@ -42,21 +42,39 @@ public abstract class BaseEntity extends BaseObject {
 	public void setAlive(boolean sa) {alive = sa;}
 	public boolean isAlive() {return alive;}
 	
-	public void inflictDamage(float dmg) {health -= dmg;}
-	public void setHealth(float sh) {health = sh;}
+	public void healDamage(float sh) {
+		health += sh;
+		if (health > maxHealth) health = maxHealth;
+	}
+	public void inflictDamage(float sd) {
+		health -= sd;
+		if (health < 0f) health = 0f;
+	}
+	public void setHealth(float sh) {
+		health = sh;
+		if (health > maxHealth) health = maxHealth;
+		if (health < 0f) health = 0f;
+	}
 	public void setMaxHealth(float mh) {maxHealth = mh;}
 	public float getHealth() {return health;}
 	public float getMaxHealth() {return maxHealth;}
 	
-	public void BlocksInRange(ArrayList<Pair> pairs, ArrayList<Block> blocks) {
+	public void ObjectsInRange(ArrayList<Pair> pairs, ArrayList<BaseObject> objects) {
 		if (isAlive()) {
-			ArrayList<Block> inrange = new ArrayList<Block>();
+			ArrayList<BaseObject> inrange = new ArrayList<BaseObject>();
 			ArrayList<Float> distinrange = new ArrayList<Float>();
-			for (int i=0;i<blocks.size();i++) {
-				Vector2f dist = Vector2f.sub(getPos(), blocks.get(i).getPos(), null);
+			for (int i=0;i<objects.size();i++) {
+				Vector2f dist = Vector2f.sub(getPos(), objects.get(i).getPos(), null);
 				if (dist.lengthSquared() < 10000f) {
-					//blocks.get(i).highlight();
-					inrange.add(blocks.get(i));
+					if (objects.get(i) instanceof BaseEntity) {
+						BaseEntity o = (BaseEntity)objects.get(i);
+						if (!o.isAlive()) continue;
+					}
+					if (objects.get(i) instanceof Block) {
+						Block o = (Block)objects.get(i);
+						o.highlight();
+					}
+					inrange.add(objects.get(i));
 					distinrange.add(dist.length());
 				}
 			}
@@ -73,32 +91,10 @@ public abstract class BaseEntity extends BaseObject {
 				inrange.remove(next);
 				distinrange.remove(next);
 			}
+			inrange.clear();
+			distinrange.clear();
 		}
-	}
-	
-	public void EntitiesInRange(ArrayList<Pair> pairs, ArrayList<BaseEntity> entities) {
-		ArrayList<BaseEntity> inrange = new ArrayList<BaseEntity>();
-		ArrayList<Float> distinrange = new ArrayList<Float>();
-		for (int i=0;i<entities.size();i++) {
-			Vector2f dist = Vector2f.sub(getPos(), entities.get(i).getPos(), null);
-			if (entities.get(i).isAlive() && dist.lengthSquared() < 10000f) {
-				inrange.add(entities.get(i));
-				distinrange.add(dist.length());
-			}
-		}
-		while (distinrange.size() > 0) {
-			float bestDist = Float.MAX_VALUE;
-			int next = 0;
-			for (int i=0;i<distinrange.size();i++) {
-				if (distinrange.get(i) < bestDist) {
-					bestDist = distinrange.get(i);
-					next = i;
-				}
-			}
-			pairs.add(new Pair(this, inrange.get(next)));
-			inrange.remove(next);
-			distinrange.remove(next);
-		}
+		objects.clear();
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {
@@ -146,11 +142,17 @@ public abstract class BaseEntity extends BaseObject {
 	}
 	
 	public void update() {
-		if (isAlive() && health <= 0f) {
-			setAlive(false);
-			health = 0f;
-			setDY(0f);
-			applyForceY(5f);
+		if (isAlive()) {
+			if (health <= 0f) {
+				setAlive(false);
+				health = 0f;
+				setDY(0f);
+				applyForceY(5f);
+			}
+		}
+		if (getY() < -1000f) {
+			if (isAlive()) inflictDamage(3f);
+			else despawn();
 		}
 		super.update();
 	}

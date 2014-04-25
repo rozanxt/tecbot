@@ -17,6 +17,7 @@ public class BumperBlock extends Block {
 		shape.addPoint(1f, 1.2f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
+		solid = true;
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {

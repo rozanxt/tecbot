@@ -34,13 +34,13 @@ public class GatlingBullet extends Bullet {
 		shape.addPoint(1f, 0.6f);
 		shape.addPoint(1f, 0.4f);
 		shape.fix();
-		hitTime = 0;
-		alpha = 1f;
 		setSize(10f);
 		setSpeed(20f);
 		setDamage(1.5f);
 		setRange(800f);
 		setCap(getSpeed(), getSpeed());
+		hitTime = 0;
+		alpha = 1f;
 	}
 	
 	public void spawn() {

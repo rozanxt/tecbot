@@ -1,16 +1,20 @@
 package zan.tecbot.mechanism.weapon;
 
+import java.util.ArrayList;
+
 import zan.tecbot.mechanism.Player;
+import zan.tecbot.object.bullet.Bullet;
 import zan.tecbot.object.bullet.PlasmaBullet;
 
 public class PlasmaCannon extends Weapon {
 	
 	protected int energyLoad;
 	
-	public PlasmaCannon(Player su) {
-		super(su);
+	public PlasmaCannon(ArrayList<Bullet> sb, Player su) {
+		super(sb, su);
 	}
 	
+	public void cancel() {energyLoad = 0;}
 	public int getEnergyLoad() {return energyLoad;}
 	
 	public void update() {}
@@ -26,12 +30,13 @@ public class PlasmaCannon extends Weapon {
 			b.setPos(user.getTecbot().getX()+(float)Math.cos(shotangle*(Math.PI/180f))*40f, user.getTecbot().getY()-(float)Math.sin(shotangle*(Math.PI/180f))*40f);
 			b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
 			b.setAngle(shotangle);
-			if (energyLoad > 50) {
+			if (energyLoad >= 50) {
 				b.setSize(energyLoad*0.2f);
 				b.setDamage((float)Math.floor(energyLoad/20)*10f);
 			}
+			b.setPlayerBullet(true);
 			b.spawn();
-			user.getBullets().add(b);
+			bullets.add(b);
 			energyLoad = 0;
 		}
 	}
@@ -42,10 +47,12 @@ public class PlasmaCannon extends Weapon {
 			if (energyLoad > 100) energyLoad = 100;
 			else user.drainEnergy(0.5f);
 		}
+		user.getTecbot().fullyLoadedPlasma(energyLoad);
 	}
 	
 	public void onRelease() {
 		user.regEnergy();
+		user.getTecbot().fullyLoadedPlasma(0f);
 	}
 	
 }

@@ -30,15 +30,17 @@ public class DestroyAbleBlock extends Block {
 		shape.addPoint(1f, 1f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
+		solid = true;
 		health = 20f;
 	}
 	
-	public void inflictDamage(float dmg) {health -= dmg;}
+	public void inflictDamage(float sd) {health -= sd;}
 	
 	public void update() {
 		super.update();
 		if (health <= 0f) {
 			health = 0f;
+			solid = false;
 			despawn();
 		}
 	}

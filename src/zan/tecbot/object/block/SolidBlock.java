@@ -33,6 +33,9 @@ public class SolidBlock extends Block {
 			shape.addPoint(1f, 0f);
 		}
 		shape.fix();
+		solid = true;
 	}
+	
+	public int getType() {return type;}
 	
 }

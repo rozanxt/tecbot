@@ -3,20 +3,17 @@ package zan.tecbot.mechanism;
 import java.util.ArrayList;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.util.vector.Vector2f;
 
 import zan.game.input.InputManager;
 import zan.game.input.MouseEvent;
-import zan.tecbot.mechanism.weapon.GatlingGun;
-import zan.tecbot.mechanism.weapon.NoWeapon;
-import zan.tecbot.mechanism.weapon.PlasmaCannon;
-import zan.tecbot.mechanism.weapon.Weapon;
+import zan.tecbot.mechanism.weapon.*;
 import zan.tecbot.object.bullet.Bullet;
 import zan.tecbot.object.entity.Tecbot;
-import zan.tecbot.panel.GamePanel;
 
 public class Player {
 	
-	protected GamePanel gamePanel;
+	protected Tecbot tecbot;
 	
 	protected Weapon[] weapons;
 	protected int weapon;
@@ -25,25 +22,37 @@ public class Player {
 	protected float energyReg;
 	protected float maxEnergy;
 	
-	public Player(GamePanel gp) {
-		gamePanel = gp;
+	private static Vector2f playerSpawn;
+	
+	public Player(Tecbot st, ArrayList<Bullet> sb) {
+		tecbot = st;
 		weapons = new Weapon[3];
-		weapons[0] = new NoWeapon(this);
-		weapons[1] = new PlasmaCannon(this);
-		weapons[2] = new GatlingGun(this);
+		weapons[0] = new NoWeapon(sb, this);
+		weapons[1] = new PlasmaCannon(sb, this);
+		weapons[2] = new GatlingGun(sb, this);
 		weapon = 0;
 		trigger = false;
 		energy = 100f;
 		energyReg = 0.5f;
 		maxEnergy = 200f;
+		playerSpawn = new Vector2f(0f, 0f);
 	}
 	
-	public Tecbot getTecbot() {return gamePanel.getTecbot();}
-	public ArrayList<Bullet> getBullets() {return gamePanel.getBullets();}
+	public void respawn() {
+		tecbot.setPos(playerSpawn.x, playerSpawn.y);
+		tecbot.spawn();
+	}
 	
-	public int getEnergyLoad() {
-		PlasmaCannon pc = (PlasmaCannon)weapons[1];
-		return pc.getEnergyLoad();
+	public Tecbot getTecbot() {return tecbot;}
+	
+	public void setPlayerSpawn(float sx, float sy) {playerSpawn.set(sx, sy);}
+	public Vector2f getPlayerSpawn() {return playerSpawn;}
+	
+	public void setWeapon(int sw) {weapon = sw;}
+	public int getWeapon() {return weapon;}
+	
+	public void heal(float sh) {
+		tecbot.setHealth(tecbot.getHealth()+sh);
 	}
 	public void addAmmo(int sa) {
 		GatlingGun gg = (GatlingGun)weapons[2];
@@ -61,9 +70,12 @@ public class Player {
 		GatlingGun gg = (GatlingGun)weapons[2];
 		return gg.isBurnedOut();
 	}
-	
-	public void setWeapon(int sw) {weapon = sw;}
-	public int getWeapon() {return weapon;}
+	public int getEnergyLoad() {
+		PlasmaCannon pc = (PlasmaCannon)weapons[1];
+		return pc.getEnergyLoad();
+	}
+	public float getEnergy() {return energy;}
+	public float getMaxEnergy() {return maxEnergy;}
 	
 	public void regEnergy() {
 		energy += energyReg;
@@ -73,12 +85,10 @@ public class Player {
 		energy -= ed;
 		if (energy < 0f) energy = 0f;
 	}
-	public float getEnergy() {return energy;}
-	public float getMaxEnergy() {return maxEnergy;}
 	
 	public void input() {
 		ArrayList<MouseEvent> mouseEvents = InputManager.getMouseEvents();
-		if (gamePanel.getTecbot().isAlive()) {
+		if (tecbot.isAlive()) {
 			for (int e=0;e<mouseEvents.size();e++) {
 				MouseEvent event = mouseEvents.get(e);
 				if (event.isButtonDown()) {
@@ -88,8 +98,8 @@ public class Player {
 					}
 				} else {
 					if (event.isButton(0)) {
-						weapons[weapon].release();
 						trigger = false;
+						weapons[weapon].release();
 					}
 				}
 			}
@@ -103,6 +113,9 @@ public class Player {
 			}
 			
 			for (int i=0;i<weapons.length;i++) weapons[i].update();
+		} else {
+			PlasmaCannon pc = (PlasmaCannon)weapons[1];
+			pc.cancel();
 		}
 	}
 	

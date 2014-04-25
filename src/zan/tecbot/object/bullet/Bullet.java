@@ -11,6 +11,7 @@ import zan.tecbot.object.block.Block;
 import zan.tecbot.object.block.DestroyAbleBlock;
 import zan.tecbot.object.entity.BadBot;
 import zan.tecbot.object.entity.BaseEntity;
+import zan.tecbot.object.entity.Tecbot;
 
 public class Bullet extends BaseObject {
 	
@@ -38,7 +39,9 @@ public class Bullet extends BaseObject {
 		dist = 0f;
 	}
 	
+	public boolean isHostile() {return hostile;}
 	public void setPlayerBullet(boolean pb) {playerBullet = pb;}
+	public boolean isPlayerBullet() {return playerBullet;}
 	public void setSpeed(float ss) {speed = ss;}
 	public float getSpeed() {return speed;}
 	public void setDamage(float sd) {damage = sd;}
@@ -48,13 +51,25 @@ public class Bullet extends BaseObject {
 	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (hostile) {
-			if (obj instanceof BadBot) {
-				BadBot entity = (BadBot)obj;
-				entity.inflictDamage(damage);
-			}
-			if (obj instanceof DestroyAbleBlock) {
-				DestroyAbleBlock entity = (DestroyAbleBlock)obj;
-				entity.inflictDamage(damage);
+			if (obj instanceof Block) {
+				if (obj instanceof DestroyAbleBlock) {
+					DestroyAbleBlock o = (DestroyAbleBlock)obj;
+					o.inflictDamage(damage);
+				}
+			} else if (obj instanceof BaseEntity) {
+				if (playerBullet) {
+					if (obj instanceof Tecbot) return false;
+					else if (obj instanceof BadBot) {
+						BadBot o = (BadBot)obj;
+						o.inflictDamage(damage);
+					}
+				} else {
+					if (obj instanceof BadBot) return false;
+					else if (obj instanceof Tecbot) {
+						Tecbot o = (Tecbot)obj;
+						o.inflictDamage(damage);
+					}
+				}
 			}
 			Vector2f norm = new Vector2f();
 			vel.normalise(norm);
@@ -68,55 +83,42 @@ public class Bullet extends BaseObject {
 		return false;
 	}
 	
-	public void BlocksInRange(ArrayList<Pair> pairs, ArrayList<Block> blocks) {
-		ArrayList<Block> inrange = new ArrayList<Block>();
-		ArrayList<Float> distinrange = new ArrayList<Float>();
-		for (int i=0;i<blocks.size();i++) {
-			Vector2f dist = Vector2f.sub(getPos(), blocks.get(i).getPos(), null);
-			if (dist.lengthSquared() < 2500f) {
-				blocks.get(i).highlight();
-				inrange.add(blocks.get(i));
-				distinrange.add(dist.length());
-			}
-		}
-		while (distinrange.size() > 0) {
-			float bestDist = Float.MAX_VALUE;
-			int next = 0;
-			for (int i=0;i<distinrange.size();i++) {
-				if (distinrange.get(i) < bestDist) {
-					bestDist = distinrange.get(i);
-					next = i;
+	public void ObjectsInRange(ArrayList<Pair> pairs, ArrayList<BaseObject> objects) {
+		if (isHostile()) {
+			ArrayList<BaseObject> inrange = new ArrayList<BaseObject>();
+			ArrayList<Float> distinrange = new ArrayList<Float>();
+			for (int i=0;i<objects.size();i++) {
+				Vector2f dist = Vector2f.sub(getPos(), objects.get(i).getPos(), null);
+				if (dist.lengthSquared() < 2500f) {
+					if (objects.get(i) instanceof BaseEntity) {
+						BaseEntity o = (BaseEntity)objects.get(i);
+						if (!o.isAlive()) continue;
+					}
+					if (objects.get(i) instanceof Block) {
+						Block o = (Block)objects.get(i);
+						o.highlight();
+					}
+					inrange.add(objects.get(i));
+					distinrange.add(dist.length());
 				}
 			}
-			pairs.add(new Pair(this, inrange.get(next)));
-			inrange.remove(next);
-			distinrange.remove(next);
-		}
-	}
-	
-	public void EntitiesInRange(ArrayList<Pair> pairs, ArrayList<BaseEntity> entities) {
-		ArrayList<BaseEntity> inrange = new ArrayList<BaseEntity>();
-		ArrayList<Float> distinrange = new ArrayList<Float>();
-		for (int i=0;i<entities.size();i++) {
-			Vector2f dist = Vector2f.sub(getPos(), entities.get(i).getPos(), null);
-			if (entities.get(i).isAlive() && dist.lengthSquared() < 2500f) {
-				inrange.add(entities.get(i));
-				distinrange.add(dist.length());
-			}
-		}
-		while (distinrange.size() > 0) {
-			float bestDist = Float.MAX_VALUE;
-			int next = 0;
-			for (int i=0;i<distinrange.size();i++) {
-				if (distinrange.get(i) < bestDist) {
-					bestDist = distinrange.get(i);
-					next = i;
+			while (distinrange.size() > 0) {
+				float bestDist = Float.MAX_VALUE;
+				int next = 0;
+				for (int i=0;i<distinrange.size();i++) {
+					if (distinrange.get(i) < bestDist) {
+						bestDist = distinrange.get(i);
+						next = i;
+					}
 				}
+				pairs.add(new Pair(this, inrange.get(next)));
+				inrange.remove(next);
+				distinrange.remove(next);
 			}
-			pairs.add(new Pair(this, inrange.get(next)));
-			inrange.remove(next);
-			distinrange.remove(next);
+			inrange.clear();
+			distinrange.clear();
 		}
+		objects.clear();
 	}
 	
 	public void update() {

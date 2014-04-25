@@ -1,7 +1,10 @@
 package zan.tecbot.mechanism.weapon;
 
+import java.util.ArrayList;
+
 import zan.game.util.GameUtility;
 import zan.tecbot.mechanism.Player;
+import zan.tecbot.object.bullet.Bullet;
 import zan.tecbot.object.bullet.GatlingBullet;
 
 public class GatlingGun extends Weapon {
@@ -10,9 +13,9 @@ public class GatlingGun extends Weapon {
 	protected int maxAmmo;
 	protected int burnout;
 	
-	public GatlingGun(Player su) {
-		super(su);
-		ammo = 1000;
+	public GatlingGun(ArrayList<Bullet> sb, Player su) {
+		super(sb, su);
+		ammo = 500;
 		maxAmmo = 1000;
 		burnout = 0;
 	}
@@ -44,8 +47,9 @@ public class GatlingGun extends Weapon {
 			b.setPos(user.getTecbot().getX()+(float)Math.cos(shotangle*(Math.PI/180f))*20f, user.getTecbot().getY()-(float)Math.sin(shotangle*(Math.PI/180f))*20f);
 			b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
 			b.setAngle(shotangle);
+			b.setPlayerBullet(true);
 			b.spawn();
-			user.getBullets().add(b);
+			bullets.add(b);
 			ammo--;
 			
 			user.drainEnergy(0.5f);

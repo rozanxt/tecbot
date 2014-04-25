@@ -6,13 +6,14 @@ import zan.game.sprite.ISprite;
 import zan.game.sprite.Sprite;
 import zan.game.sprite.SpriteManager;
 import zan.game.util.GameUtility;
+import zan.tecbot.mechanism.GridMap;
 
 public class DummBot extends BadBot {
 	
 	protected ISprite[] sprite;
 	
-	public DummBot() {
-		super();
+	public DummBot(GridMap gm) {
+		super(gm);
 		setSize(100f);
 		shape = new Shape();
 		shape.addPoint(0.31f, 0.15f);
@@ -65,10 +66,6 @@ public class DummBot extends BadBot {
 			applyForceY(-0.25f);
 			angle = 30f;
 		}
-		if (getY() < -1000f) {
-			if (isAlive()) inflictDamage(3f);
-			else despawn();
-		}
 		ground = false;
 		super.update();
 		anim.update();
@@ -83,25 +80,6 @@ public class DummBot extends BadBot {
 		/*glColor4f(1f, 0f, 1f, 1f);
 		super.render();
 		glColor4f(1f, 1f, 1f, 1f);*/
-		
-		/*glDisable(GL_TEXTURE_2D);
-		glPushMatrix();
-		
-		glTranslatef(pos.x, pos.y, 0f);
-		glScalef(size, size, 0f);
-		glRotatef(-gunangle, 0f, 0f, 1f);
-		
-		glColor4f(1f, 0f, 0f, 1f);
-		glBegin(GL_LINE_LOOP);
-			glVertex2f(-0.05f, -0.05f);
-			glVertex2f(-0.05f, 0.05f);
-			glVertex2f(0.4f, 0.05f);
-			glVertex2f(0.4f, -0.05f);
-		glEnd();
-		glColor4f(1f, 1f, 1f, 1f);
-		
-		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);*/
 	}
 	
 }

@@ -33,13 +33,13 @@ public class PlasmaBullet extends Bullet {
 			shape.addPoint((float)(0.5f+0.5f*Math.cos(angle)), (float)(0.5f+0.5f*Math.sin(angle)));
 		}
 		shape.fix();
-		hitTime = 0;
-		alpha = 1f;
 		setSize(10f);
 		setSpeed(10f);
 		setDamage(10f);
 		setRange(800f);
 		setCap(getSpeed(), getSpeed());
+		hitTime = 0;
+		alpha = 1f;
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {
