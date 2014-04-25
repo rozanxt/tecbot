@@ -18,6 +18,7 @@ public class AmmoCollectible extends Collectible {
 	}
 	
 	public void collected() {
+		if (collector.getAmmo() >= collector.getMaxAmmo()) return;
 		collector.addAmmo(300);
 		super.collected();
 	}

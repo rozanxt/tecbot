@@ -46,7 +46,7 @@ public class GummBot extends BadBot {
 			if (ground) {
 				setDY(-5f);
 				if (facing == 1) {
-					if (turnOnEdge && !gridMap.isSolidBlock(tx-1, ty-1) && !gridMap.isSolidBlock(tx-1, ty-2)) {
+					if (turnOnEdge && !gridMap.isSolidBlock(tx-1, ty-1) && !gridMap.isSolidBlock(tx-1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 2)) {
 						facing = 0;
 					} else if ((gridMap.isSolidBlockType(tx-1, ty, 1) || gridMap.isSolidBlockType(tx-1, ty, 2)) && gridMap.isSolidBlock(tx-1, ty+2)) {
 						facing = 0;
@@ -58,14 +58,14 @@ public class GummBot extends BadBot {
 						applyForceY(5f);
 						ground = false;
 						onground = false;
-					} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0)) {
+					} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0) && !gridMap.isSolidBlockType(tx-1, ty, 1)) {
 						moving = true;
 						applyForceX(-0.5f);
 					} else {
 						facing = 0;
 					}
 				} else if (facing == 0) {
-					if (turnOnEdge && !gridMap.isSolidBlock(tx+1, ty-1) && !gridMap.isSolidBlock(tx+1, ty-2)) {
+					if (turnOnEdge && !gridMap.isSolidBlock(tx+1, ty-1) && !gridMap.isSolidBlock(tx+1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 1)) {
 						facing = 1;
 					} else if ((gridMap.isSolidBlockType(tx+1, ty, 1) || gridMap.isSolidBlockType(tx+1, ty, 2)) && gridMap.isSolidBlock(tx+1, ty+2)) {
 						facing = 1;
@@ -77,7 +77,7 @@ public class GummBot extends BadBot {
 						applyForceY(5f);
 						ground = false;
 						onground = false;
-					} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0)) {
+					} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0) && !gridMap.isSolidBlockType(tx+1, ty, 2)) {
 						moving = true;
 						applyForceX(0.5f);
 					} else {

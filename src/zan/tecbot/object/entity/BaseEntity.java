@@ -70,10 +70,6 @@ public abstract class BaseEntity extends BaseObject {
 						BaseEntity o = (BaseEntity)objects.get(i);
 						if (!o.isAlive()) continue;
 					}
-					if (objects.get(i) instanceof Block) {
-						Block o = (Block)objects.get(i);
-						o.highlight();
-					}
 					inrange.add(objects.get(i));
 					distinrange.add(dist.length());
 				}

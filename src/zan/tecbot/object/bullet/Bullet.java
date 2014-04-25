@@ -49,6 +49,8 @@ public class Bullet extends BaseObject {
 	public void setRange(float sr) {range = sr;}
 	public float getRange() {return range;}
 	
+	protected void outOfRange() {despawn();}
+	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (hostile) {
 			if (obj instanceof Block) {
@@ -94,10 +96,10 @@ public class Bullet extends BaseObject {
 						BaseEntity o = (BaseEntity)objects.get(i);
 						if (!o.isAlive()) continue;
 					}
-					if (objects.get(i) instanceof Block) {
+					/*if (objects.get(i) instanceof Block) {
 						Block o = (Block)objects.get(i);
 						o.highlight();
-					}
+					}*/
 					inrange.add(objects.get(i));
 					distinrange.add(dist.length());
 				}
@@ -124,7 +126,7 @@ public class Bullet extends BaseObject {
 	public void update() {
 		super.update();
 		dist += speed;
-		if (hostile && dist > range) despawn();
+		if (hostile && dist > range) outOfRange();
 	}
 	
 }

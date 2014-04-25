@@ -20,5 +20,6 @@ public abstract class Weapon {
 	public abstract void release();
 	public abstract void onTrigger();
 	public abstract void onRelease();
+	public abstract void cancel();
 	
 }

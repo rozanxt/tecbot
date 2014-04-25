@@ -14,5 +14,6 @@ public class NoWeapon extends Weapon {
 	public void release() {}
 	public void onTrigger() {user.regEnergy();}
 	public void onRelease() {user.regEnergy();}
+	public void cancel() {}
 	
 }

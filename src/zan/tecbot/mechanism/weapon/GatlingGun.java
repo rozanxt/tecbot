@@ -61,4 +61,6 @@ public class GatlingGun extends Weapon {
 		user.regEnergy();
 	}
 	
+	public void cancel() {}
+	
 }

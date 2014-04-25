@@ -54,6 +54,8 @@ public class Player {
 	public void heal(float sh) {
 		tecbot.setHealth(tecbot.getHealth()+sh);
 	}
+	public float getHealth() {return tecbot.getHealth();}
+	public float getMaxHealth() {return tecbot.getMaxHealth();}
 	public void addAmmo(int sa) {
 		GatlingGun gg = (GatlingGun)weapons[2];
 		gg.addAmmo(sa);
@@ -114,8 +116,8 @@ public class Player {
 			
 			for (int i=0;i<weapons.length;i++) weapons[i].update();
 		} else {
-			PlasmaCannon pc = (PlasmaCannon)weapons[1];
-			pc.cancel();
+			trigger = false;
+			for (int i=0;i<weapons.length;i++) weapons[i].cancel();
 		}
 	}
 	

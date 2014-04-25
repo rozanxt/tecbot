@@ -14,7 +14,6 @@ public class PlasmaCannon extends Weapon {
 		super(sb, su);
 	}
 	
-	public void cancel() {energyLoad = 0;}
 	public int getEnergyLoad() {return energyLoad;}
 	
 	public void update() {}
@@ -54,5 +53,7 @@ public class PlasmaCannon extends Weapon {
 		user.regEnergy();
 		user.getTecbot().fullyLoadedPlasma(0f);
 	}
+	
+	public void cancel() {energyLoad = 0;}
 	
 }
