@@ -22,7 +22,7 @@ public class HealthCollectible extends Collectible {
 	
 	public void collected() {
 		if (collector.getHealth() >= collector.getMaxHealth()) return;
-		collector.heal(50f);
+		collector.healDamage(50f);
 		super.collected();
 	}
 	

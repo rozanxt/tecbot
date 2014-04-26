@@ -73,7 +73,7 @@ public class DummBot extends BadBot {
 	
 	public void render() {
 		if (isAlive()) {
-			if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+			if (ground && moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
 			else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
 		} else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.5f);
 		

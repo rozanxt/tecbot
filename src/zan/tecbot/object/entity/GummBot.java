@@ -12,6 +12,7 @@ public class GummBot extends BadBot {
 	protected ISprite[] sprite;
 	
 	protected boolean turnOnEdge;
+	protected boolean jumpOnEdge;
 	protected int fallFlag;
 	
 	public GummBot(GridMap gm) {
@@ -33,9 +34,11 @@ public class GummBot extends BadBot {
 		anim.setAnimation(true, false, 3);
 		
 		setMaxHealth(50f);
+		setJumpPower(5f);
 		setCap(2.5f, 10f);
 		stompAble = true;
 		turnOnEdge = true;
+		jumpOnEdge = true;
 		fallFlag = 0;
 	}
 	
@@ -52,23 +55,16 @@ public class GummBot extends BadBot {
 						if (fallFlag == 0) {
 							fallFlag = 30;
 							facing = 0;
-						} else {
-							moving = true;
-							applyForceX(-0.5f);
-						}
+						} else if (jumpOnEdge) jump();
+						else moveLeft();
 					} else if ((gridMap.isSolidBlockType(tx-1, ty, 1) || gridMap.isSolidBlockType(tx-1, ty, 2)) && gridMap.isSolidBlock(tx-1, ty+2)) {
 						facing = 0;
 					} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx-1, ty+1, 0)) {
-						moving = true;
-						applyForceX(-0.5f);
+						moveLeft();
 					} else if (gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlock(tx-1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx-1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-						setDY(0f);
-						applyForceY(5f);
-						ground = false;
-						onground = false;
+						jump();
 					} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0) && !gridMap.isSolidBlockType(tx-1, ty, 1)) {
-						moving = true;
-						applyForceX(-0.5f);
+						moveLeft();
 					} else {
 						facing = 0;
 					}
@@ -77,38 +73,31 @@ public class GummBot extends BadBot {
 						if (fallFlag == 0) {
 							fallFlag = 30;
 							facing = 1;
-						} else {
-							moving = true;
-							applyForceX(0.5f);
-						}
+						} else if (jumpOnEdge) jump();
+						else moveRight();
 					} else if ((gridMap.isSolidBlockType(tx+1, ty, 1) || gridMap.isSolidBlockType(tx+1, ty, 2)) && gridMap.isSolidBlock(tx+1, ty+2)) {
 						facing = 1;
 					} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx+1, ty+1, 0)) {
-						moving = true;
-						applyForceX(0.5f);
+						moveRight();
 					} else if (gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlock(tx+1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx+1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-						setDY(0f);
-						applyForceY(5f);
-						ground = false;
-						onground = false;
+						jump();
 					} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0) && !gridMap.isSolidBlockType(tx+1, ty, 2)) {
-						moving = true;
-						applyForceX(0.5f);
+						moveRight();
 					} else {
 						facing = 1;
 					}
 				}
 			} else {
-				applyForceY(-0.25f);
-				if (facing == 1) {applyForceX(-0.1f);}
-				else if (facing == 0) {applyForceX(0.1f);}
+				applyGravity();
+				if (facing == 1) {airLeft();}
+				else if (facing == 0) {airRight();}
 			}
 			
 			if (onmoving && !moving) anim.setCurFrame(0);
 			onmoving = moving;
 			angle = 0f;
 		} else {
-			applyForceY(-0.25f);
+			applyGravity();
 			angle = 30f;
 		}
 		if (fallFlag > 0) fallFlag--;
@@ -119,7 +108,7 @@ public class GummBot extends BadBot {
 	
 	public void render() {
 		if (isAlive()) {
-			if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+			if (ground && moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
 			else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
 		} else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.5f);
 		

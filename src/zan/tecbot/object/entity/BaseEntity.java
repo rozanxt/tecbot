@@ -14,6 +14,7 @@ public abstract class BaseEntity extends BaseObject {
 	protected boolean alive;
 	protected float health;
 	protected float maxHealth;
+	protected float jumpPower;
 	
 	protected boolean ground;
 	protected boolean onground;
@@ -26,10 +27,11 @@ public abstract class BaseEntity extends BaseObject {
 		alive = false;
 		health = 0f;
 		maxHealth = 0f;
-		onground = false;
+		jumpPower = 0f;
 		ground = false;
-		onmoving = false;
+		onground = false;
 		moving = false;
+		onmoving = false;
 		facing = 0;
 	}
 	
@@ -42,6 +44,11 @@ public abstract class BaseEntity extends BaseObject {
 	public void setAlive(boolean sa) {alive = sa;}
 	public boolean isAlive() {return alive;}
 	
+	public boolean isOutOfBound() {
+		if (getY() < -1000f) return true;
+		return false;
+	}
+	
 	public void healDamage(float sh) {
 		health += sh;
 		if (health > maxHealth) health = maxHealth;
@@ -50,14 +57,10 @@ public abstract class BaseEntity extends BaseObject {
 		health -= sd;
 		if (health < 0f) health = 0f;
 	}
-	public void setHealth(float sh) {
-		health = sh;
-		if (health > maxHealth) health = maxHealth;
-		if (health < 0f) health = 0f;
-	}
-	public void setMaxHealth(float mh) {maxHealth = mh;}
 	public float getHealth() {return health;}
+	public void setMaxHealth(float mh) {maxHealth = mh;}
 	public float getMaxHealth() {return maxHealth;}
+	public void setJumpPower(float sj) {jumpPower = sj;}
 	
 	public void ObjectsInRange(ArrayList<Pair> pairs, ArrayList<BaseObject> objects) {
 		if (isAlive()) {
@@ -128,6 +131,19 @@ public abstract class BaseEntity extends BaseObject {
 		}
 	}
 	
+	public void stop() {moving = false;}
+	public void moveRight() {applyForceX(0.5f);	moving = true;}
+	public void moveLeft() {applyForceX(-0.5f);	moving = true;}
+	public void airRight() {applyForceX(0.1f);}
+	public void airLeft() {applyForceX(-0.1f);}
+	
+	public void jump() {
+		setDY(0f);
+		applyForceY(jumpPower);
+		ground = false;
+		onground = false;
+	}
+	
 	public void bump() {
 		if (isAlive()) {
 			applyForceY(9f);
@@ -137,16 +153,18 @@ public abstract class BaseEntity extends BaseObject {
 		}
 	}
 	
+	public void die() {
+		setAlive(false);
+		health = 0f;
+		setDY(0f);
+		applyForceY(5f);
+	}
+	
 	public void update() {
 		if (isAlive()) {
-			if (health <= 0f) {
-				setAlive(false);
-				health = 0f;
-				setDY(0f);
-				applyForceY(5f);
-			}
+			if (health <= 0f) die();
 		}
-		if (getY() < -1000f) {
+		if (isOutOfBound()) {
 			if (isAlive()) inflictDamage(3f);
 			else despawn();
 		}

@@ -51,8 +51,8 @@ public class Player {
 	public void setWeapon(int sw) {weapon = sw;}
 	public int getWeapon() {return weapon;}
 	
-	public void heal(float sh) {
-		tecbot.setHealth(tecbot.getHealth()+sh);
+	public void healDamage(float sh) {
+		tecbot.healDamage(sh);
 	}
 	public float getHealth() {return tecbot.getHealth();}
 	public float getMaxHealth() {return tecbot.getMaxHealth();}

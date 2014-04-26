@@ -46,6 +46,7 @@ public class Tecbot extends BaseEntity {
 		anim.setAnimation(true, false, 3);
 		
 		setMaxHealth(100f);
+		setJumpPower(7f);
 		setCap(4f, 10f);
 		flpani = 0;
 		flpcnt = 0f;
@@ -108,25 +109,20 @@ public class Tecbot extends BaseEntity {
 			
 			if (ground) {
 				setDY(-5f);
-				if (InputManager.isKeyDown(Keyboard.KEY_W)) {
-					setDY(0f);
-					applyForceY(7f);
-					ground = false;
-					onground = false;
-				}
-				if (InputManager.isKeyDown(Keyboard.KEY_D)) {applyForceX(0.5f); moving = true;}
-				if (InputManager.isKeyDown(Keyboard.KEY_A)) {applyForceX(-0.5f); moving = true;}
+				if (InputManager.isKeyDown(Keyboard.KEY_W)) {jump();}
+				if (InputManager.isKeyDown(Keyboard.KEY_D)) {moveRight();}
+				if (InputManager.isKeyDown(Keyboard.KEY_A)) {moveLeft();}
 			} else {
-				applyForceY(-0.25f);
-				if (InputManager.isKeyDown(Keyboard.KEY_D)) {applyForceX(0.1f);}
-				if (InputManager.isKeyDown(Keyboard.KEY_A)) {applyForceX(-0.1f);}
+				applyGravity();
+				if (InputManager.isKeyDown(Keyboard.KEY_D)) {airRight();}
+				if (InputManager.isKeyDown(Keyboard.KEY_A)) {airLeft();}
 			}
 			
 			if (onmoving && !moving) anim.setCurFrame(0);
 			onmoving = moving;
 			angle = 0f;
 		} else {
-			applyForceY(-0.25f);
+			applyGravity();
 			angle = 30f;
 		}
 		if (invulnerable > 0) invulnerable--;
@@ -164,10 +160,10 @@ public class Tecbot extends BaseEntity {
 		
 		if (isAlive()) {
 			if (invulnerable > 0) {
-				if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 0.75f);
+				if (ground && moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 0.75f);
 				else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.75f);
 			} else {
-				if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+				if (ground && moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
 				else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
 			}
 		} else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.5f);

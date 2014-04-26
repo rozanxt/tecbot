@@ -10,6 +10,8 @@ public abstract class BaseObject {
 	
 	protected String name;
 	
+	public static final float gravity = 0.25f;
+	
 	protected Vector2f pos = new Vector2f();
 	protected Vector2f vel = new Vector2f();
 	protected Vector2f acc = new Vector2f();
@@ -63,6 +65,7 @@ public abstract class BaseObject {
 	public void applyForce(float sx, float sy) {acc.x += sx; acc.y += sy;}
 	public void applyForceX(float sx) {acc.x += sx;}
 	public void applyForceY(float sy) {acc.y += sy;}
+	public void applyGravity() {acc.y -= gravity;}
 	
 	public void setAngle(float sa) {angle = sa;}
 	public float getAngle() {return angle;}

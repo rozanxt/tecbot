@@ -46,6 +46,7 @@ public class ShotBot extends BadBot {
 		anim.setAnimation(true, false, 3);
 		
 		setMaxHealth(50f);
+		setJumpPower(5f);
 		setCap(2.5f, 10f);
 		stompAble = true;
 		bullets = sb;
@@ -95,33 +96,36 @@ public class ShotBot extends BadBot {
 		return super.getViewAngle();
 	}
 	
+	public void shot() {
+		if (shotdelay == 0) {
+			float shotangle=gunangle+GameUtility.getRnd().nextInt(10)-5f;
+			PlasmaBullet b = new PlasmaBullet();
+			b.setPos(getX()+(float)Math.cos(shotangle*(Math.PI/180f))*40f, getY()-(float)Math.sin(shotangle*(Math.PI/180f))*40f);
+			b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
+			b.setAngle(shotangle);
+			b.spawn();
+			bullets.add(b);
+			shotdelay = 100;
+		}
+	}
+	
 	public void update() {
 		AnimatedSprite anim = (AnimatedSprite) sprite[1];
 		int tx = GridMap.getTileX(getX());
 		int ty = GridMap.getTileY(getY()-(getSize()/4f));
 		moving = false;
-		
 		if (isAlive()) {
 			if (target != null && target.isAlive()) {
 				if (targetFocused > 0) {
 					float ox = target.getX()-getX();
-					if (Math.abs(ox) > 100f) moving = true;
+					if (Math.abs(ox) > 150f) moving = true;
 					else moving = false;
 					if (ox < 0f) facing = 1;
 					else if (ox > 0f) facing = 0;
 					gunangle = getViewAngle();
 				} else gunangle = super.getViewAngle();
 				
-				if (targetInSight && shotdelay == 0) {
-					float shotangle=gunangle+GameUtility.getRnd().nextInt(10)-5f;
-					PlasmaBullet b = new PlasmaBullet();
-					b.setPos(getX()+(float)Math.cos(shotangle*(Math.PI/180f))*40f, getY()-(float)Math.sin(shotangle*(Math.PI/180f))*40f);
-					b.setVel((float)Math.cos(shotangle*(Math.PI/180f))*b.getSpeed(), -(float)Math.sin(shotangle*(Math.PI/180f))*b.getSpeed());
-					b.setAngle(shotangle);
-					b.spawn();
-					bullets.add(b);
-					shotdelay = 100;
-				}
+				if (targetInSight) shot();
 			}
 			
 			if (ground) {
@@ -130,37 +134,31 @@ public class ShotBot extends BadBot {
 					setCap(2.5f, 10f);
 					if (facing == 1) {
 						if (!gridMap.isSolidBlock(tx-1, ty-1) && !gridMap.isSolidBlock(tx-1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							moving = false;
+							stop();
 						} else if ((gridMap.isSolidBlockType(tx-1, ty, 1) || gridMap.isSolidBlockType(tx-1, ty, 2)) && gridMap.isSolidBlock(tx-1, ty+2)) {
-							moving = false;
+							stop();
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx-1, ty+1, 0)) {
-							if (moving) applyForceX(-0.5f);
+							if (moving) moveLeft();
 						} else if (gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlock(tx-1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx-1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(5f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0) && !gridMap.isSolidBlockType(tx-1, ty, 1)) {
-							if (moving) applyForceX(-0.5f);
+							if (moving) moveLeft();
 						} else {
-							moving = false;
+							stop();
 						}
 					} else if (facing == 0) {
 						if (!gridMap.isSolidBlock(tx+1, ty-1) && !gridMap.isSolidBlock(tx+1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 1)) {
-							moving = false;
+							stop();
 						} else if ((gridMap.isSolidBlockType(tx+1, ty, 1) || gridMap.isSolidBlockType(tx+1, ty, 2)) && gridMap.isSolidBlock(tx+1, ty+2)) {
-							moving = false;
+							stop();
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx+1, ty+1, 0)) {
-							if (moving) applyForceX(0.5f);
+							if (moving) moveRight();
 						} else if (gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlock(tx+1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx+1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(5f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0) && !gridMap.isSolidBlockType(tx+1, ty, 2)) {
-							if (moving) applyForceX(0.5f);
+							if (moving) moveRight();
 						} else {
-							moving = false;
+							stop();
 						}
 					}
 				} else {
@@ -169,20 +167,15 @@ public class ShotBot extends BadBot {
 						if (!gridMap.isSolidBlock(tx-1, ty-1) && !gridMap.isSolidBlock(tx-1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 2)) {
 							if (waitingOnEdge == 0) waitingOnEdge = 100;
 							else if (waitingOnEdge == 1) facing = 0;
-							else moving = false;
+							else stop();
 						} else if ((gridMap.isSolidBlockType(tx-1, ty, 1) || gridMap.isSolidBlockType(tx-1, ty, 2)) && gridMap.isSolidBlock(tx-1, ty+2)) {
 							facing = 0;
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx-1, ty+1, 0)) {
-							moving = true;
-							applyForceX(-0.5f);
+							moveLeft();
 						} else if (gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlock(tx-1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx-1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(5f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0) && !gridMap.isSolidBlockType(tx-1, ty, 1)) {
-							moving = true;
-							applyForceX(-0.5f);
+							moveLeft();
 						} else {
 							facing = 0;
 						}
@@ -190,35 +183,32 @@ public class ShotBot extends BadBot {
 						if (!gridMap.isSolidBlock(tx+1, ty-1) && !gridMap.isSolidBlock(tx+1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 1)) {
 							if (waitingOnEdge == 0) waitingOnEdge = 100;
 							else if (waitingOnEdge == 1) facing = 1;
-							else moving = false;
+							else stop();
 						} else if ((gridMap.isSolidBlockType(tx+1, ty, 1) || gridMap.isSolidBlockType(tx+1, ty, 2)) && gridMap.isSolidBlock(tx+1, ty+2)) {
 							facing = 1;
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx+1, ty+1, 0)) {
-							moving = true;
-							applyForceX(0.5f);
+							moveRight();
 						} else if (gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlock(tx+1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx+1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(5f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0) && !gridMap.isSolidBlockType(tx+1, ty, 2)) {
-							moving = true;
-							applyForceX(0.5f);
+							moveRight();
 						} else {
 							facing = 1;
 						}
 					}
 				}
 			} else {
-				applyForceY(-0.25f);
-				if (facing == 1 && moving) {applyForceX(-0.1f);}
-				else if (facing == 0 && moving) {applyForceX(0.1f);}
+				applyGravity();
+				if (moving) {
+					if (facing == 1) {airLeft();}
+					else if (facing == 0) {airRight();}
+				}
 			}
 			if (onmoving && !moving) anim.setCurFrame(0);
 			onmoving = moving;
 			angle = 0f;
 		} else {
-			applyForceY(-0.25f);
+			applyGravity();
 			angle = 30f;
 		}
 		if (shotdelay > 0) shotdelay--;
@@ -231,7 +221,7 @@ public class ShotBot extends BadBot {
 	
 	public void render() {
 		if (isAlive()) {
-			if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+			if (ground && moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
 			else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
 		} else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.5f);
 		

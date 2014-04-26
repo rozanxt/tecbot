@@ -42,6 +42,7 @@ public class HuntBot extends BadBot {
 		anim.setAnimation(true, false, 3);
 		
 		setMaxHealth(50f);
+		setJumpPower(7f);
 		setCap(3f, 10f);
 		stompAble = true;
 		bullets = sb;
@@ -92,7 +93,6 @@ public class HuntBot extends BadBot {
 		int tx = GridMap.getTileX(getX());
 		int ty = GridMap.getTileY(getY()-(getSize()/4f));
 		moving = false;
-		
 		if (isAlive()) {
 			if (target != null && target.isAlive()) {
 				if (targetFocused > 0) {
@@ -113,51 +113,33 @@ public class HuntBot extends BadBot {
 					setCap(3f, 10f);
 					if (facing == 1) {
 						if (!gridMap.isSolidBlock(tx-1, ty-1) && !gridMap.isSolidBlock(tx-1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							if (jumpOnEdge) {
-								setDY(0f);
-								applyForceY(7f);
-								ground = false;
-								onground = false;
-							} else {
-								if (moving) applyForceX(-0.5f);
-							}
+							if (jumpOnEdge) jump();
+							else if (moving) moveLeft();
 						} else if ((gridMap.isSolidBlockType(tx-1, ty, 1) || gridMap.isSolidBlockType(tx-1, ty, 2)) && gridMap.isSolidBlock(tx-1, ty+2)) {
-							moving = false;
+							stop();
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx-1, ty+1, 0)) {
-							if (moving) applyForceX(-0.5f);
+							if (moving) moveLeft();
 						} else if (gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlock(tx-1, ty+2) && !gridMap.isSolidBlock(tx-1, ty+3) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx, ty+3) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(7f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0) && !gridMap.isSolidBlockType(tx-1, ty, 1)) {
-							if (moving) applyForceX(-0.5f);
+							if (moving) moveLeft();
 						} else {
-							moving = false;
+							stop();
 						}
 					} else if (facing == 0) {
 						if (!gridMap.isSolidBlock(tx+1, ty-1) && !gridMap.isSolidBlock(tx+1, ty-2) && !gridMap.isSolidBlockType(tx, ty, 1)) {
-							if (jumpOnEdge) {
-								setDY(0f);
-								applyForceY(7f);
-								ground = false;
-								onground = false;
-							} else {
-								if (moving) applyForceX(0.5f);
-							}
+							if (jumpOnEdge) jump();
+							else if (moving) moveRight();
 						} else if ((gridMap.isSolidBlockType(tx+1, ty, 1) || gridMap.isSolidBlockType(tx+1, ty, 2)) && gridMap.isSolidBlock(tx+1, ty+2)) {
-							moving = false;
+							stop();
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx+1, ty+1, 0)) {
-							if (moving) applyForceX(0.5f);
+							if (moving) moveRight();
 						} else if (gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlock(tx+1, ty+2) && !gridMap.isSolidBlock(tx+1, ty+3) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx, ty+3) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(7f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0) && !gridMap.isSolidBlockType(tx+1, ty, 2)) {
-							if (moving) applyForceX(0.5f);
+							if (moving) moveRight();
 						} else {
-							moving = false;
+							stop();
 						}
 					}
 				} else {
@@ -167,23 +149,15 @@ public class HuntBot extends BadBot {
 							if (fallFlag == 0) {
 								fallFlag = 30;
 								facing = 0;
-							} else {
-								moving = true;
-								applyForceX(-0.5f);
-							}
+							} else moveLeft();
 						} else if ((gridMap.isSolidBlockType(tx-1, ty, 1) || gridMap.isSolidBlockType(tx-1, ty, 2)) && gridMap.isSolidBlock(tx-1, ty+2)) {
 							facing = 0;
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx-1, ty+1, 0)) {
-							moving = true;
-							applyForceX(-0.5f);
+							moveLeft();
 						} else if (gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlock(tx-1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx-1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(7f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx-1, ty, 0) && !gridMap.isSolidBlockType(tx-1, ty+1, 0) && !gridMap.isSolidBlockType(tx-1, ty, 1)) {
-							moving = true;
-							applyForceX(-0.5f);
+							moveLeft();
 						} else {
 							facing = 0;
 						}
@@ -192,38 +166,32 @@ public class HuntBot extends BadBot {
 							if (fallFlag == 0) {
 								fallFlag = 30;
 								facing = 1;
-							} else {
-								moving = true;
-								applyForceX(-0.5f);
-							}
+							} else moveRight();
 						} else if ((gridMap.isSolidBlockType(tx+1, ty, 1) || gridMap.isSolidBlockType(tx+1, ty, 2)) && gridMap.isSolidBlock(tx+1, ty+2)) {
 							facing = 1;
 						} else if ((gridMap.isSolidBlockType(tx, ty, 1) || gridMap.isSolidBlockType(tx, ty, 2)) && !gridMap.isSolidBlockType(tx+1, ty+1, 0)) {
-							moving = true;
-							applyForceX(0.5f);
+							moveRight();
 						} else if (gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlock(tx+1, ty+1) && !gridMap.isSolidBlock(tx, ty+2) && !gridMap.isSolidBlock(tx+1, ty+2) && !gridMap.isSolidBlockType(tx, ty, 1) && !gridMap.isSolidBlockType(tx, ty, 2)) {
-							setDY(0f);
-							applyForceY(7f);
-							ground = false;
-							onground = false;
+							jump();
 						} else if (!gridMap.isSolidBlockType(tx+1, ty, 0) && !gridMap.isSolidBlockType(tx+1, ty+1, 0) && !gridMap.isSolidBlockType(tx+1, ty, 2)) {
-							moving = true;
-							applyForceX(0.5f);
+							moveRight();
 						} else {
 							facing = 1;
 						}
 					}
 				}
 			} else {
-				applyForceY(-0.25f);
-				if (facing == 1 && moving) {applyForceX(-0.1f);}
-				else if (facing == 0 && moving) {applyForceX(0.1f);}
+				applyGravity();
+				if (moving) {
+					if (facing == 1) {airLeft();}
+					else if (facing == 0) {airRight();}
+				}
 			}
 			if (onmoving && !moving) anim.setCurFrame(0);
 			onmoving = moving;
 			angle = 0f;
 		} else {
-			applyForceY(-0.25f);
+			applyGravity();
 			angle = 30f;
 		}
 		if (targetFocused > 0) targetFocused--;
@@ -235,7 +203,7 @@ public class HuntBot extends BadBot {
 	
 	public void render() {
 		if (isAlive()) {
-			if (moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
+			if (ground && moving) sprite[1].render(getX(), getY(), getSize(), angle, facing, 1f);
 			else sprite[0].render(getX(), getY(), getSize(), angle, facing, 1f);
 		} else sprite[0].render(getX(), getY(), getSize(), angle, facing, 0.5f);
 		
