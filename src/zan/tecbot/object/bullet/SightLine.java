@@ -61,7 +61,7 @@ public class SightLine extends Bullet {
 		super.update();
 	}
 	
-	public void render() {
+	 public void render() {
 		/*glDisable(GL_TEXTURE_2D);
 		glPushMatrix();
 		

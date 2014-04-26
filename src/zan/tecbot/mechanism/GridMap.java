@@ -64,12 +64,18 @@ public class GridMap {
 				float ty = (tileHeight*(mapHeight-0.5f))-j*tileHeight;
 				if (code == 's') {
 					gamePlayer.setPlayerSpawn(tx, ty);
-				} else if (code == 'b') {
+				} else if (code == 'x') {
 					GummBot e = new GummBot(this);
 					e.setPos(tx, ty);
 					e.spawn();
 					entities.add(e);
-				} else if (code == 'n') {
+				} else if (code == 'c') {
+					HuntBot e = new HuntBot(bullets, this);
+					e.setPos(tx, ty);
+					e.setTarget(gamePlayer.getTecbot());
+					e.spawn();
+					entities.add(e);
+				} else if (code == 'v') {
 					ShotBot e = new ShotBot(bullets, this);
 					e.setPos(tx, ty);
 					e.setTarget(gamePlayer.getTecbot());
