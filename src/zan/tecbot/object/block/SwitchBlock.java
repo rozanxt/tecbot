@@ -13,6 +13,7 @@ public class SwitchBlock extends Block {
 	public SwitchBlock(int sx, int sy, GridMap gm) {
 		super(sx, sy);
 		gridMap = gm;
+		setPowered(false);
 		switchAble = false;
 		switchTimer = 0;
 		switchCount = 0;

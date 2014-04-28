@@ -28,8 +28,8 @@ public class DoorBlock extends Block {
 		shape.addPoint(1f, 1f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
-		setPowered(false);
 		setSolid(true);
+		setPowered(false);
 	}
 	
 	public void update() {

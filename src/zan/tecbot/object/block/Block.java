@@ -11,8 +11,8 @@ public abstract class Block extends BaseObject {
 	protected int type;
 	protected char wireID;
 	protected int tileX, tileY;
-	protected boolean powered;
 	protected boolean solid;
+	protected boolean powered;
 	protected boolean highlight;
 	
 	public Block(int sx, int sy) {
@@ -21,8 +21,8 @@ public abstract class Block extends BaseObject {
 		wireID = ' ';
 		tileX = sx;
 		tileY = sy;
-		powered = false;
 		solid = false;
+		powered = false;
 		highlight = false;
 	}
 	
@@ -32,11 +32,11 @@ public abstract class Block extends BaseObject {
 	public void setWireID(char id) {wireID = id;}
 	public char getWireID() {return wireID;}
 	
-	public void setPowered(boolean so) {powered = so;}
-	public boolean isPowered() {return powered;}
-	
 	public void setSolid(boolean ss) {solid = ss;}
 	public boolean isSolid() {return solid;}
+	
+	public void setPowered(boolean so) {powered = so;}
+	public boolean isPowered() {return powered;}
 	
 	public void setTilePos(int sx, int sy) {tileX = sx; tileY = sy;}
 	public void setTileX(int sx) {tileX = sx;}

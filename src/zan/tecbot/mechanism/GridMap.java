@@ -14,6 +14,8 @@ public class GridMap {
 	
 	public static int getTileX(float sx) {return (int)Math.floor(sx/tileWidth);}
 	public static int getTileY(float sy) {return (int)Math.floor(sy/tileHeight);}
+	public static float getGameX(int sx) {return (sx+0.5f)*tileWidth;}
+	public static float getGameY(int sy) {return (sy+0.5f)*tileHeight;}
 	
 	private String mapData, wireData;
 	private int mapWidth, mapHeight;
@@ -185,6 +187,14 @@ public class GridMap {
 					b.setSize(tileSize);
 					b.spawn();
 					blocks.add(b);
+					tiles[i][mapHeight-j-1] = b;
+				} else if (code == 'm') {
+					MovingPlatform b = new MovingPlatform(i, mapHeight-j-1);
+					b.setPos(tx, ty);
+					b.setSize(tileSize*3f);
+					b.spawn();
+					blocks.add(b);
+					giveWireID(b, i, mapHeight-j-1);
 					tiles[i][mapHeight-j-1] = b;
 				} else if (code == 'd') {
 					DoorBlock b = new DoorBlock(i, mapHeight-j-1);

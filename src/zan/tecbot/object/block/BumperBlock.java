@@ -1,18 +1,6 @@
 package zan.tecbot.object.block;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex2f;
+import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.util.vector.Vector2f;
 
@@ -31,8 +19,8 @@ public class BumperBlock extends Block {
 		shape.addPoint(1f, 1.1f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
-		setPowered(true);
 		setSolid(true);
+		setPowered(true);
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {

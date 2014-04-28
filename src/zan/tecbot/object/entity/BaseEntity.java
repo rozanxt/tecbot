@@ -8,6 +8,7 @@ import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Pair;
 import zan.tecbot.object.block.Block;
+import zan.tecbot.object.block.MovingPlatform;
 
 public abstract class BaseEntity extends BaseObject {
 	
@@ -22,6 +23,9 @@ public abstract class BaseEntity extends BaseObject {
 	protected boolean onmoving;
 	protected int facing;
 	
+	protected MovingPlatform anchor;
+	protected float anchorX;
+	
 	public BaseEntity() {
 		super();
 		alive = false;
@@ -33,6 +37,8 @@ public abstract class BaseEntity extends BaseObject {
 		moving = false;
 		onmoving = false;
 		facing = 0;
+		anchor = null;
+		anchorX = 0f;
 	}
 	
 	public void spawn() {
@@ -61,6 +67,13 @@ public abstract class BaseEntity extends BaseObject {
 	public void setMaxHealth(float mh) {maxHealth = mh;}
 	public float getMaxHealth() {return maxHealth;}
 	public void setJumpPower(float sj) {jumpPower = sj;}
+	
+	public void setAnchor(MovingPlatform sa) {
+		if (anchor != sa) {
+			anchor = sa;
+			anchorX = getX()-anchor.getX();
+		}
+	}
 	
 	public void ObjectsInRange(ArrayList<Pair> pairs, ArrayList<BaseObject> objects) {
 		if (isAlive()) {
@@ -131,6 +144,10 @@ public abstract class BaseEntity extends BaseObject {
 		if (isAlive()) {
 			if (onground && !ground) {setY(getY()-getDY()); setDY(0f);}
 			onground = ground;
+			if (anchor != null && !ground) {
+				setDX(getDX()-anchor.getAnchorDX());
+				anchor = null;
+			}
 		}
 	}
 	
@@ -171,7 +188,19 @@ public abstract class BaseEntity extends BaseObject {
 			if (isAlive()) inflictDamage(3f);
 			else despawn();
 		}
-		super.update();
+		if (anchor != null) {
+			vel.x += acc.x;
+			vel.y += acc.y;
+			
+			if (Math.abs(vel.x) > dxcap) vel.x = vel.x*dxcap/Math.abs(vel.x);
+			if (Math.abs(vel.y) > dycap) vel.y = vel.y*dycap/Math.abs(vel.y);
+			
+			anchorX += vel.x;
+			pos.x = anchor.getX()+anchorX;
+			pos.y += vel.y;
+			
+			acc.set(0f, 0f);
+		} else super.update();
 	}
 	
 }

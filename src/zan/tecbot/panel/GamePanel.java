@@ -51,7 +51,7 @@ public class GamePanel implements IPanel {
 		bullets = new ArrayList<Bullet>();
 		collectibles = new ArrayList<Collectible>();
 		pairs = new ArrayList<Pair>();
-		exitCount = 200;
+		exitCount = 100;
 	}
 	
 	public boolean isInitialized() {return initialized;}
@@ -164,7 +164,7 @@ public class GamePanel implements IPanel {
 			if (gridMap.inExit()) {
 				exitCount--;
 				if (exitCount <= 0) endGame();
-			} else exitCount = 200;
+			} else exitCount = 100;
 		} else {
 			if (InputManager.isKeyPressed(Keyboard.KEY_Q)) endGame();
 		}
