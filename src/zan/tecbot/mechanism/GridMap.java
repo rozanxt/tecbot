@@ -68,7 +68,6 @@ public class GridMap {
 			block.setWireID(wireID);
 			wires.add(block);
 		}
-		System.out.println(wires.size());
 	}
 	
 	public void checkWire(char id) {

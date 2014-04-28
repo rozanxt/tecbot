@@ -4,9 +4,11 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import zan.game.GameCore;
+import zan.game.GameCore.Panel;
 import zan.game.input.InputManager;
 import zan.game.object.BaseObject;
 import zan.game.object.Collision;
@@ -62,8 +64,10 @@ public class GamePanel implements IPanel {
 		gamePlayer.respawn();
 		
 		InputManager.setMouseGrabbed(true);
+		CameraPort.init();
 		initialized = true;
 	}
+	public void destroy() {initialized = false;}
 	
 	public void update() {
 		if (InputManager.isMouseGrabbed()) {
@@ -150,6 +154,8 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).correction();
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
 			for (int i=0;i<collectibles.size();i++) if (collectibles.get(i).isActive()) collectibles.get(i).correction();
+		} else {
+			if (InputManager.isKeyPressed(Keyboard.KEY_Q)) GameCore.changePanel(Panel.TITLE);
 		}
 	}
 	

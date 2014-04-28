@@ -30,6 +30,7 @@ import zan.game.util.CameraPort;
 import zan.game.util.GameUtility;
 import zan.game.util.IconLoader;
 import zan.tecbot.panel.GamePanel;
+import zan.tecbot.panel.TitlePanel;
 
 /** The main GameCore class */
 public class GameCore {
@@ -70,7 +71,8 @@ public class GameCore {
 	private static GameCore gameCore = null;
 	
 	/** Panels */
-	private IPanel gamePanel;
+	public static enum Panel {TITLE, GAME}
+	private static IPanel corePanel;
 	
 	/** Constructor */
 	private GameCore() {}
@@ -244,19 +246,29 @@ public class GameCore {
 	
 	// -------------------------------------------------------------------------------------------------------- //
 	
+	public static void changePanel(Panel sp) {
+		if (corePanel != null) corePanel.destroy();
+		switch (sp) {
+			case TITLE:
+				corePanel = new TitlePanel();
+				break;
+			case GAME:
+				corePanel = new GamePanel();
+				break;
+		}
+		corePanel.init();
+	}
+	
 	/** Init game */
 	private void init() {
-		//TODO
-		gamePanel = new GamePanel();
-		gamePanel.init();
+		changePanel(Panel.TITLE);
 	}
 	
 	/** Update game */
 	private void update() {
 		InputManager.poll();
 		
-		//TODO
-		if (gamePanel != null && gamePanel.isInitialized()) gamePanel.update();
+		if (corePanel != null && corePanel.isInitialized()) corePanel.update();
 		
 		if (InputManager.isKeyPressed(Keyboard.KEY_F11)) setFullScreen(!isFullScreen());
 	}
@@ -265,9 +277,7 @@ public class GameCore {
 	private void render() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		//TODO
-		if (gamePanel != null && gamePanel.isInitialized()) gamePanel.render();
-		
+		if (corePanel != null && corePanel.isInitialized()) corePanel.render();
 	}
 	
 	// -------------------------------------------------------------------------------------------------------- //

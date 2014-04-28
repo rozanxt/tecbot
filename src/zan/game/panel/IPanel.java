@@ -2,10 +2,11 @@ package zan.game.panel;
 
 public interface IPanel {
 	
-	void init();
-	void update();
-	void render();
+	public void init();
+	public void destroy();
+	public void update();
+	public void render();
 	
-	boolean isInitialized();
+	public boolean isInitialized();
 	
 }
