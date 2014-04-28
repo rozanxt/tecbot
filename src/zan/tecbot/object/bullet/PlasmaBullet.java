@@ -22,6 +22,7 @@ import zan.game.object.Shape;
 
 public class PlasmaBullet extends Bullet {
 	
+	protected boolean fullyLoaded;
 	protected int hitTime;
 	protected float alpha;
 	
@@ -38,9 +39,12 @@ public class PlasmaBullet extends Bullet {
 		setDamage(10f);
 		setRange(800f);
 		setCap(getSpeed(), getSpeed());
+		fullyLoaded = false;
 		hitTime = 0;
 		alpha = 1f;
 	}
+	
+	public boolean isFullyLoaded() {return fullyLoaded;}
 	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (super.collide(obj, col)) {
@@ -57,6 +61,8 @@ public class PlasmaBullet extends Bullet {
 			if (hitTime > 0) hitTime --;
 			else despawn();
 		}
+		if (getDamage() >= 40f) fullyLoaded = true;
+		else fullyLoaded = false;
 	}
 	
 	public void render() {
@@ -68,7 +74,7 @@ public class PlasmaBullet extends Bullet {
 		else glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		if (getDamage() >= 40f) glColor4f(1f, 0.5f, 0f, alpha);
+		if (fullyLoaded) glColor4f(1f, 0.5f, 0f, alpha);
 		else glColor4f(0f, 1f, 1f, alpha);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {

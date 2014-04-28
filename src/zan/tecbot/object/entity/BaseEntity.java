@@ -99,25 +99,28 @@ public abstract class BaseEntity extends BaseObject {
 	public boolean collide(BaseObject obj, Collision col) {
 		if (isAlive()) {
 			if (obj instanceof Block) {
-				Vector2f norm = col.normal;
-				Vector2f negnorm = new Vector2f();
-				norm.negate(negnorm);
-				
-				if (col.normFriction() && norm.y > 0f && getSupportPoint(norm).y >= obj.getSupportPoint(negnorm).y && getDY() < 0f) ground = true;
-				if (norm.y < 0f && getSupportPoint(norm).y <= obj.getSupportPoint(negnorm).y && getDY() > 0f) setDY(0f);
-				
-				// QUICK FIX
-				if (!col.normFriction()) {
-					Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
-					if (foot.y >= obj.getGroundSupportPoint(foot).y-15f) {
-						setY(getY()+norm.y*(1f-col.distance));
-					} else {
-						setX(getX()+norm.x*(1f-col.distance));
+				Block b = (Block)obj;
+				if (b.isSolid()) {
+					Vector2f norm = col.normal;
+					Vector2f negnorm = new Vector2f();
+					norm.negate(negnorm);
+					
+					if (col.normFriction() && norm.y > 0f && getSupportPoint(norm).y >= obj.getSupportPoint(negnorm).y && getDY() < 0f) ground = true;
+					if (norm.y < 0f && getSupportPoint(norm).y <= obj.getSupportPoint(negnorm).y && getDY() > 0f) setDY(0f);
+					
+					// QUICK FIX
+					if (!col.normFriction()) {
+						Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
+						if (foot.y >= obj.getGroundSupportPoint(foot).y-15f) {
+							setY(getY()+norm.y*(1f-col.distance));
+						} else {
+							setX(getX()+norm.x*(1f-col.distance));
+						}
 					}
+					if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
+					
+					if (!moving) setDX(getDX()*0.7f);
 				}
-				if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
-				
-				if (!moving) setDX(getDX()*0.7f);
 			}
 			return true;
 		}

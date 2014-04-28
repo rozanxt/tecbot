@@ -54,6 +54,8 @@ public class Bullet extends BaseObject {
 	public boolean collide(BaseObject obj, Collision col) {
 		if (hostile) {
 			if (obj instanceof Block) {
+				Block b = (Block)obj;
+				if (!b.isSolid()) return false;
 				if (obj instanceof DestroyAbleBlock) {
 					DestroyAbleBlock o = (DestroyAbleBlock)obj;
 					o.inflictDamage(damage);

@@ -4,11 +4,9 @@ import zan.game.object.Shape;
 
 public class SolidBlock extends Block {
 	
-	protected int type;
-	
 	public SolidBlock(int sx, int sy, int st) {
 		super(sx, sy);
-		type = st;
+		setType(st);
 		shape = new Shape();
 		if (type == 1) {
 			shape.addPoint(0f, 0f);
@@ -33,9 +31,7 @@ public class SolidBlock extends Block {
 			shape.addPoint(1f, 0f);
 		}
 		shape.fix();
-		solid = true;
+		setSolid(true);
 	}
-	
-	public int getType() {return type;}
 	
 }

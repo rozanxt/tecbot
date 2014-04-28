@@ -18,11 +18,9 @@ import org.lwjgl.util.vector.Vector2f;
 
 import zan.game.object.Shape;
 
-public class DestroyAbleBlock extends Block {
+public class DoorBlock extends Block {
 	
-	protected float health;
-	
-	public DestroyAbleBlock(int sx, int sy) {
+	public DoorBlock(int sx, int sy) {
 		super(sx, sy);
 		shape = new Shape();
 		shape.addPoint(0f, 0f);
@@ -30,41 +28,46 @@ public class DestroyAbleBlock extends Block {
 		shape.addPoint(1f, 1f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
+		setPowered(false);
 		setSolid(true);
-		health = 20f;
 	}
-	
-	public void inflictDamage(float sd) {health -= sd;}
 	
 	public void update() {
 		super.update();
-		if (health <= 0f) {
-			health = 0f;
-			setSolid(false);
-			despawn();
-		}
+		if (isPowered()) setSolid(false);
+		else setSolid(true);
 	}
 	
 	public void render() {
-		glDisable(GL_TEXTURE_2D);
-		glPushMatrix();
-		
-		glTranslatef(pos.x, pos.y, 0f);
-		glScalef(size, size, 0f);
-		glRotatef(-angle, 0f, 0f, 1f);
-		
-		if (highlight) glColor4f(1f, 0f, 0f, 1f);
-		else glColor4f(0.6f, 0.3f, 0f, 1f);
-		glBegin(GL_LINE_LOOP);
-			for (int i=0;i<shape.getNumPoints();i++) {
-				Vector2f vertex = shape.getPoint(i);
-				glVertex2f(vertex.x - 0.5f, vertex.y - 0.5f);
-			}
-		glEnd();
-		glColor4f(1f, 1f, 1f, 1f);
-		
-		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);
+		if (!isPowered()) {
+			glDisable(GL_TEXTURE_2D);
+			glPushMatrix();
+			
+			glTranslatef(pos.x, pos.y, 0f);
+			glScalef(size, size, 0f);
+			glRotatef(-angle, 0f, 0f, 1f);
+			
+			if (highlight) glColor4f(0f, 0f, 1f, 1f);
+			glBegin(GL_LINE_LOOP);
+				for (int i=0;i<shape.getNumPoints();i++) {
+					Vector2f vertex = shape.getPoint(i);
+					glVertex2f(vertex.x - 0.5f, vertex.y - 0.5f);
+				}
+			glEnd();
+			glColor4f(1f, 1f, 1f, 1f);
+			
+			glColor4f(1f, 0f, 0f, 1f);
+			glBegin(GL_LINE_LOOP);
+				glVertex2f(-0.25f, -0.25f);
+				glVertex2f(-0.25f, 0.25f);
+				glVertex2f(0.25f, 0.25f);
+				glVertex2f(0.25f, -0.25f);
+			glEnd();
+			glColor4f(1f, 1f, 1f, 1f);
+			
+			glPopMatrix();
+			glEnable(GL_TEXTURE_2D);
+		}
 	}
 	
 }

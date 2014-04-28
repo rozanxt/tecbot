@@ -54,7 +54,7 @@ public class GamePanel implements IPanel {
 	
 	public void init() {
 		MapReader mapReader = new MapReader("map0.lgm");
-		gridMap = new GridMap(mapReader.getMapData(), mapReader.getMapWidth(), mapReader.getMapHeight());
+		gridMap = new GridMap(mapReader.getMapData(), mapReader.getWireData(), mapReader.getMapWidth(), mapReader.getMapHeight());
 		tecbot = new Tecbot();
 		gamePlayer = new Player(tecbot, bullets);
 		
