@@ -21,6 +21,8 @@ public class GridMap {
 	private ArrayList<Block> wires;
 	private Block[][] tiles;
 	
+	private boolean inExit;
+	
 	public GridMap(String md, String wd, int mw, int mh) {
 		mapData = md;
 		wireData = wd;
@@ -28,11 +30,21 @@ public class GridMap {
 		mapHeight = mh;
 		wires = new ArrayList<Block>();
 		tiles = new Block[mapWidth][mapHeight];
+		inExit = false;
 	}
 	
 	public void destroy() {
 		wires.clear();
 		for (int j=0;j<mapHeight;j++) for (int i=0;i<mapWidth;i++) tiles[i][j] = null;
+	}
+	
+	public void reachExit() {inExit = true;}
+	public boolean inExit() {
+		if (inExit) {
+			inExit = false;
+			return true;
+		}
+		return false;
 	}
 	
 	public Block getBlock(int sx, int sy) {
@@ -200,6 +212,13 @@ public class GridMap {
 					c.setPos(tx, ty);
 					c.spawn();
 					collectibles.add(c);
+				} else if (code == 'q') {
+					ExitArea x = new ExitArea(i, mapHeight-j-1, this);
+					x.setPos(tx, ty);
+					x.setSize(tileSize);
+					x.spawn();
+					blocks.add(x);
+					tiles[i][mapHeight-j-1] = x;
 				}
 			}
 		}

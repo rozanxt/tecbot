@@ -8,7 +8,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import zan.game.GameCore;
-import zan.game.GameCore.Panel;
 import zan.game.input.InputManager;
 import zan.game.object.BaseObject;
 import zan.game.object.Collision;
@@ -40,6 +39,8 @@ public class GamePanel implements IPanel {
 	private ArrayList<Collectible> collectibles;
 	private ArrayList<Pair> pairs;
 	
+	private int exitCount;
+	
 	public GamePanel() {
 		initialized = false;
 		gridMap = null;
@@ -50,6 +51,7 @@ public class GamePanel implements IPanel {
 		bullets = new ArrayList<Bullet>();
 		collectibles = new ArrayList<Collectible>();
 		pairs = new ArrayList<Pair>();
+		exitCount = 200;
 	}
 	
 	public boolean isInitialized() {return initialized;}
@@ -68,6 +70,10 @@ public class GamePanel implements IPanel {
 		initialized = true;
 	}
 	public void destroy() {initialized = false;}
+	
+	public void endGame() {
+		GameCore.changePanel(GameCore.Panel.TITLE);
+	}
 	
 	public void update() {
 		if (InputManager.isMouseGrabbed()) {
@@ -154,8 +160,13 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).correction();
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
 			for (int i=0;i<collectibles.size();i++) if (collectibles.get(i).isActive()) collectibles.get(i).correction();
+			
+			if (gridMap.inExit()) {
+				exitCount--;
+				if (exitCount <= 0) endGame();
+			} else exitCount = 200;
 		} else {
-			if (InputManager.isKeyPressed(Keyboard.KEY_Q)) GameCore.changePanel(Panel.TITLE);
+			if (InputManager.isKeyPressed(Keyboard.KEY_Q)) endGame();
 		}
 	}
 	
