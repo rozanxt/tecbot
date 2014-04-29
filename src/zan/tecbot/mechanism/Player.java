@@ -22,7 +22,8 @@ public class Player {
 	protected float energyReg;
 	protected float maxEnergy;
 	
-	private static Vector2f playerSpawn;
+	protected int playerLife;
+	protected Vector2f playerSpawn;
 	
 	public Player(Tecbot st, ArrayList<Bullet> sb) {
 		tecbot = st;
@@ -35,15 +36,33 @@ public class Player {
 		energy = 100f;
 		energyReg = 0.5f;
 		maxEnergy = 200f;
+		playerLife = 3;
 		playerSpawn = new Vector2f(0f, 0f);
 	}
 	
-	public void respawn() {
-		tecbot.setPos(playerSpawn.x, playerSpawn.y);
+	public void spawn() {
 		tecbot.spawn();
+		tecbot.setPos(playerSpawn.x, playerSpawn.y);
+		tecbot.setVel(0f, 0f);
+	}
+	public void respawn() {
+		if (playerLife > 0) {
+			tecbot.spawn();
+			tecbot.setPos(playerSpawn.x, playerSpawn.y);
+			tecbot.setVel(0f, 0f);
+			energy = 100f;
+			playerLife--;
+		}
+	}
+	public void telespawn() {
+		tecbot.setPos(playerSpawn.x, playerSpawn.y);
+		tecbot.setVel(0f, 0f);
+		tecbot.setAnchor(null);
 	}
 	
 	public Tecbot getTecbot() {return tecbot;}
+	
+	public int getPlayerLife() {return playerLife;}
 	
 	public void setPlayerSpawn(float sx, float sy) {playerSpawn.set(sx, sy);}
 	public Vector2f getPlayerSpawn() {return playerSpawn;}

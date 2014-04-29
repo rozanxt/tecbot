@@ -9,6 +9,7 @@ import zan.game.object.Collision;
 import zan.game.object.Pair;
 import zan.tecbot.object.block.Block;
 import zan.tecbot.object.block.MovingPlatform;
+import zan.tecbot.object.block.SpikeBlock;
 
 public abstract class BaseEntity extends BaseObject {
 	
@@ -47,6 +48,8 @@ public abstract class BaseEntity extends BaseObject {
 		super.spawn();
 		alive = true;
 		health = maxHealth;
+		setVel(0f, 0f);
+		setAnchor(null);
 	}
 	
 	public void setAlive(boolean sa) {alive = sa;}
@@ -65,6 +68,11 @@ public abstract class BaseEntity extends BaseObject {
 		health -= sd;
 		if (health < 0f) health = 0f;
 	}
+	public void setHealth(float sh) {
+		health = sh;
+		if (health > maxHealth) health = maxHealth;
+		if (health < 0f) health = 0f;
+	}
 	public float getHealth() {return health;}
 	public void setMaxHealth(float mh) {maxHealth = mh;}
 	public float getMaxHealth() {return maxHealth;}
@@ -73,7 +81,7 @@ public abstract class BaseEntity extends BaseObject {
 	public void setAnchor(MovingPlatform sa) {
 		if (anchor != sa) {
 			anchor = sa;
-			anchorX = getX()-anchor.getX();
+			if (anchor != null) anchorX = getX()-anchor.getX();
 		}
 	}
 	
@@ -147,6 +155,7 @@ public abstract class BaseEntity extends BaseObject {
 						}
 					}
 				}
+				if (obj instanceof SpikeBlock) {die();}
 			}
 			return true;
 		}

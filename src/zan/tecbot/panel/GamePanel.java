@@ -58,18 +58,29 @@ public class GamePanel implements IPanel {
 	
 	public void init() {
 		MapReader mapReader = new MapReader("map0.lgm");
-		gridMap = new GridMap(mapReader.getMapData(), mapReader.getWireData(), mapReader.getMapWidth(), mapReader.getMapHeight());
+		gridMap = new GridMap(mapReader.getMapDatas());
 		tecbot = new Tecbot();
 		gamePlayer = new Player(tecbot, bullets);
 		
-		gridMap.createMap(gamePlayer, blocks, entities, bullets, collectibles);
-		gamePlayer.respawn();
+		gridMap.initPlayerSpawn();
+		createMap();
+		gamePlayer.spawn();
 		
 		InputManager.setMouseGrabbed(true);
 		CameraPort.init();
 		initialized = true;
 	}
 	public void destroy() {initialized = false;}
+	
+	public void createMap() {
+		entities.clear();
+		blocks.clear();
+		bullets.clear();
+		collectibles.clear();
+		
+		gridMap.changeMap();
+		gridMap.createMap(gamePlayer, blocks, entities, bullets, collectibles);
+	}
 	
 	public void endGame() {
 		GameCore.changePanel(GameCore.Panel.TITLE);
@@ -109,43 +120,16 @@ public class GamePanel implements IPanel {
 			}
 			
 			// Create Collision Pairs
-			ArrayList<Block> hlb = new ArrayList<Block>();
 			if (tecbot.isActive()) {
 				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(blocks));
 				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(entities));
 				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(bullets));
 				tecbot.ObjectsInRange(pairs, new ArrayList<BaseObject>(collectibles));
-				Block b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-1);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())-1, GridMap.getTileY(tecbot.getY())-2);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-1);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX())+1, GridMap.getTileY(tecbot.getY())-2);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-1);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(tecbot.getX()), GridMap.getTileY(tecbot.getY())-2);
-				if (b != null) hlb.add(b);
 			}
 			for (int i=0;i<entities.size();i++) if (entities.get(i).isActive()) {
 				entities.get(i).ObjectsInRange(pairs, new ArrayList<BaseObject>(blocks));
 				entities.get(i).ObjectsInRange(pairs, new ArrayList<BaseObject>(bullets));
-				Block b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-1);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())-1, GridMap.getTileY(entities.get(i).getY())-2);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-1);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX())+1, GridMap.getTileY(entities.get(i).getY())-2);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-1);
-				if (b != null) hlb.add(b);
-				b = gridMap.getBlock(GridMap.getTileX(entities.get(i).getX()), GridMap.getTileY(entities.get(i).getY())-2);
-				if (b != null) hlb.add(b);
 			}
-			for (int i=0;i<hlb.size();i++) hlb.get(i).highlight();
-			hlb.clear();
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) {
 				bullets.get(i).ObjectsInRange(pairs, new ArrayList<BaseObject>(blocks));
 			}
@@ -161,10 +145,15 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
 			for (int i=0;i<collectibles.size();i++) if (collectibles.get(i).isActive()) collectibles.get(i).correction();
 			
+			if (gridMap.requestMapChange()) {
+				createMap();
+				gamePlayer.telespawn();
+			}
 			if (gridMap.inExit()) {
 				exitCount--;
 				if (exitCount <= 0) endGame();
 			} else exitCount = 100;
+			if (gamePlayer.getPlayerLife() <= 0) endGame();
 		} else {
 			if (InputManager.isKeyPressed(Keyboard.KEY_Q)) endGame();
 		}
@@ -234,12 +223,16 @@ public class GamePanel implements IPanel {
 		TextManager.renderText("FPS: " + GameCore.getFPS(), "defont", 5f, GameCore.GAME_HEIGHT - 5f, 10f, 6);
 		TextManager.renderText("Mouse Position: " + GridMap.getTileX(mp[0]) + " " + GridMap.getTileY(mp[1]), "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
 		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
-		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
+		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth() + " (Life: " + gamePlayer.getPlayerLife() + ")", "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
 		TextManager.renderText("Energy: " + gamePlayer.getEnergy() + " / " + gamePlayer.getMaxEnergy(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);
 		TextManager.renderText("Load: " + gamePlayer.getEnergyLoad(), "defont", 5f, GameCore.GAME_HEIGHT - 55f, 10f, 6);
 		if (gamePlayer.isBurnedOut()) glColor4f(1f, 0f, 0f, 0.8f);
 		TextManager.renderText("Ammo: " + gamePlayer.getAmmo() + " / " + gamePlayer.getMaxAmmo(), "defont", 5f, GameCore.GAME_HEIGHT - 65f, 10f, 6);
 		glColor4f(1f, 1f, 1f, 1f);
+		String weaponname = "None";
+		if (gamePlayer.getWeapon() == 1) weaponname = "Plasma Cannon";
+		else if (gamePlayer.getWeapon() == 2) weaponname = "Gatling Gun";
+		TextManager.renderText("Weapon: " + weaponname, "defont", 5f, GameCore.GAME_HEIGHT - 75f, 10f, 6);
 		
 		if (Mouse.isGrabbed()) {
 			if (exitCount < 100) {

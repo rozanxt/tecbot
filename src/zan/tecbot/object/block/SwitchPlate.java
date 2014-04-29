@@ -20,43 +20,51 @@ import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Shape;
 import zan.tecbot.mechanism.GridMap;
-import zan.tecbot.object.entity.Tecbot;
+import zan.tecbot.object.entity.BaseEntity;
 
-public class ExitArea extends Block {
+public class SwitchPlate extends SwitchBlock {
 	
-	protected GridMap gridMap;
+	protected boolean onPlate;
+	protected boolean wasOnPlate;
 	
-	protected boolean inExit;
-	
-	public ExitArea(int sx, int sy, GridMap gm) {
-		super(sx, sy);
-		gridMap = gm;
+	public SwitchPlate(int sx, int sy, GridMap gm) {
+		super(sx, sy, gm);
 		shape = new Shape();
 		shape.addPoint(0f, 0f);
-		shape.addPoint(0f, 0.1f);
-		shape.addPoint(1f, 0.1f);
+		shape.addPoint(0f, 1.1f);
+		shape.addPoint(1f, 1.1f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
-		setSolid(false);
-		setPowered(true);
-		inExit = false;
+		setSolid(true);
+		setSwitchAble(true);
+		onPlate = false;
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {
-		if (obj instanceof Tecbot) {
-			if (isPowered()) {
-				inExit = true;
-				return true;
+		if (obj instanceof BaseEntity) {
+			Vector2f norm = col.normal;
+			Vector2f negnorm = new Vector2f();
+			norm.negate(negnorm);
+			
+			if (col.normFriction() && negnorm.y > 0f && obj.getSupportPoint(negnorm).y >= getSupportPoint(norm).y && obj.getDY() < 0f) {
+		 		if (!onPlate) {
+		 			if (isSwitchAble()) {
+		 				if (isPowered()) setPowered(false);
+		 				else setPowered(true);
+		 			} else setPowered(true);
+		 			onPlate = true;
+		 		}
+		 		wasOnPlate = true;
+		 		return true;
 			}
 		}
 		return false;
 	}
 	
 	public void update() {
-		if (inExit) {
-			gridMap.reachExit();
-			inExit = false;
-		}
+		super.update();
+		if (onPlate && !wasOnPlate) onPlate = false;
+		wasOnPlate = false;
 	}
 	
 	public void render() {
@@ -67,13 +75,22 @@ public class ExitArea extends Block {
 		glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		if (inExit) glColor4f(0f, 1f, 0f, 1f);
-		else glColor4f(1f, 0f, 1f, 1f);
+		if (highlight) glColor4f(0f, 0f, 1f, 1f);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {
 				Vector2f vertex = shape.getPoint(i);
 				glVertex2f(vertex.x - 0.5f, vertex.y - 0.5f);
 			}
+		glEnd();
+		glColor4f(1f, 1f, 1f, 1f);
+		
+		if (isPowered()) glColor4f(0f, 1f, 1f, 1f);
+		else glColor4f(1f, 0f, 0f, 1f);
+		glBegin(GL_LINE_LOOP);
+			glVertex2f(-0.25f, 0f);
+			glVertex2f(0f, 0.25f);
+			glVertex2f(0.25f, 0f);
+			glVertex2f(0f, -0.25f);
 		glEnd();
 		glColor4f(1f, 1f, 1f, 1f);
 		

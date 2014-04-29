@@ -14,48 +14,56 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
+import zan.game.input.InputManager;
 import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Shape;
 import zan.tecbot.mechanism.GridMap;
 import zan.tecbot.object.entity.Tecbot;
 
-public class ExitArea extends Block {
+public class TelePort extends Block {
 	
 	protected GridMap gridMap;
 	
-	protected boolean inExit;
+	protected Vector2f teleDest;
+	protected boolean onPort;
 	
-	public ExitArea(int sx, int sy, GridMap gm) {
+	public TelePort(int sx, int sy, GridMap gm) {
 		super(sx, sy);
 		gridMap = gm;
 		shape = new Shape();
 		shape.addPoint(0f, 0f);
-		shape.addPoint(0f, 0.1f);
-		shape.addPoint(1f, 0.1f);
+		shape.addPoint(0f, 1f);
+		shape.addPoint(1f, 1f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
 		setSolid(false);
 		setPowered(true);
-		inExit = false;
+		teleDest = null;
+		onPort = false;
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (obj instanceof Tecbot) {
-			if (isPowered()) {
-				inExit = true;
-				return true;
-			}
+			if (teleDest != null) {
+				obj.setPos(teleDest.x, teleDest.y);
+				obj.setVel(0f, 0f);
+				teleDest = null;
+			} else onPort = true;
+			return true;
 		}
 		return false;
 	}
 	
 	public void update() {
-		if (inExit) {
-			gridMap.reachExit();
-			inExit = false;
+		if (isPowered() && onPort) {
+			if (InputManager.isKeyPressed(Keyboard.KEY_SPACE)) {
+				teleDest = gridMap.getTeleDest(getTileX(), getTileY(), wireID);
+			}
+			onPort = false;
 		}
 	}
 	
@@ -67,7 +75,7 @@ public class ExitArea extends Block {
 		glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		if (inExit) glColor4f(0f, 1f, 0f, 1f);
+		if (onPort) glColor4f(0f, 1f, 0f, 1f);
 		else glColor4f(1f, 0f, 1f, 1f);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {

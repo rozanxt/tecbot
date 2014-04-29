@@ -16,47 +16,19 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import zan.game.object.BaseObject;
-import zan.game.object.Collision;
 import zan.game.object.Shape;
-import zan.tecbot.mechanism.GridMap;
-import zan.tecbot.object.entity.Tecbot;
 
-public class ExitArea extends Block {
+public class SpikeBlock extends Block {
 	
-	protected GridMap gridMap;
-	
-	protected boolean inExit;
-	
-	public ExitArea(int sx, int sy, GridMap gm) {
+	public SpikeBlock(int sx, int sy) {
 		super(sx, sy);
-		gridMap = gm;
 		shape = new Shape();
 		shape.addPoint(0f, 0f);
-		shape.addPoint(0f, 0.1f);
-		shape.addPoint(1f, 0.1f);
+		shape.addPoint(0f, 0.5f);
+		shape.addPoint(1f, 0.5f);
 		shape.addPoint(1f, 0f);
 		shape.fix();
 		setSolid(false);
-		setPowered(true);
-		inExit = false;
-	}
-	
-	public boolean collide(BaseObject obj, Collision col) {
-		if (obj instanceof Tecbot) {
-			if (isPowered()) {
-				inExit = true;
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public void update() {
-		if (inExit) {
-			gridMap.reachExit();
-			inExit = false;
-		}
 	}
 	
 	public void render() {
@@ -67,8 +39,7 @@ public class ExitArea extends Block {
 		glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		if (inExit) glColor4f(0f, 1f, 0f, 1f);
-		else glColor4f(1f, 0f, 1f, 1f);
+		glColor4f(1f, 0f, 0f, 1f);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {
 				Vector2f vertex = shape.getPoint(i);
