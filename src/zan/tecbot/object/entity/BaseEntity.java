@@ -25,6 +25,7 @@ public abstract class BaseEntity extends BaseObject {
 	
 	protected MovingPlatform anchor;
 	protected float anchorX;
+	protected boolean squashUp, squashDown, squashLeft, squashRight;
 	
 	public BaseEntity() {
 		super();
@@ -39,6 +40,7 @@ public abstract class BaseEntity extends BaseObject {
 		facing = 0;
 		anchor = null;
 		anchorX = 0f;
+		squashUp = squashDown = squashLeft = squashRight = false;
 	}
 	
 	public void spawn() {
@@ -129,10 +131,21 @@ public abstract class BaseEntity extends BaseObject {
 						} else {
 							setX(getX()+norm.x*(1f-col.distance));
 						}
+						if (anchor != null) {anchorX = getX()-anchor.getX();}
 					}
 					if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
 					
 					if (!moving) setDX(getDX()*0.7f);
+					
+					if (col.distance < -15f) {
+						if (col.normFriction()) {
+							if (norm.y > 0f) squashUp = true;
+							else if(norm.y < 0f) squashDown = true;
+						} else {
+							if (norm.x > 0f) squashRight = true;
+							else if(norm.x < 0f) squashLeft = true;
+						}
+					}
 				}
 			}
 			return true;
@@ -145,7 +158,8 @@ public abstract class BaseEntity extends BaseObject {
 			if (onground && !ground) {setY(getY()-getDY()); setDY(0f);}
 			onground = ground;
 			if (anchor != null && !ground) {
-				setDX(getDX()-anchor.getAnchorDX());
+				setDX(getDX()+anchor.getAnchorDX());
+				setDY(getDY()+anchor.getAnchorDY());
 				anchor = null;
 			}
 		}
@@ -183,12 +197,14 @@ public abstract class BaseEntity extends BaseObject {
 	public void update() {
 		if (isAlive()) {
 			if (health <= 0f) die();
+			if ((squashUp && squashDown) || (squashLeft && squashRight)) die();
+			squashUp = squashDown = squashLeft = squashRight = false;
 		}
 		if (isOutOfBound()) {
 			if (isAlive()) inflictDamage(3f);
 			else despawn();
 		}
-		if (anchor != null) {
+		if (isAlive() && anchor != null) {
 			vel.x += acc.x;
 			vel.y += acc.y;
 			

@@ -25,7 +25,7 @@ import zan.tecbot.object.entity.BaseEntity;
 public class MovingPlatform extends Block {
 	
 	protected float theta;
-	protected float anchorDX;
+	protected float anchorDX, anchorDY;
 	
 	public MovingPlatform(int sx, int sy) {
 		super(sx, sy);
@@ -38,9 +38,11 @@ public class MovingPlatform extends Block {
 		setSolid(true);
 		setPowered(true);
 		theta = 0f;
+		anchorDX = anchorDY = 0f;
 	}
 	
 	public float getAnchorDX() {return anchorDX;}
+	public float getAnchorDY() {return anchorDY;}
 	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (isPowered() && obj instanceof BaseEntity) {
@@ -59,13 +61,23 @@ public class MovingPlatform extends Block {
 	
 	public void update() {
 		if (isPowered()) {
-			float beforeX = (float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth);
-			theta += 1f;
-			if (theta >= 360f) theta -= 360f;
-			else if (theta < 0f) theta += 360f;
-			float afterX = (float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth);
-			anchorDX = beforeX - afterX;
-			setX((float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth));
+			if (getType() == 0) {
+				float beforeX = (float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth);
+				theta += 1f;
+				if (theta >= 360f) theta -= 360f;
+				else if (theta < 0f) theta += 360f;
+				float afterX = (float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth);
+				anchorDX = afterX-beforeX;
+				setX((float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth));
+			} else if (getType() == 1) {
+				float beforeY = (float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight);
+				theta += 1f;
+				if (theta >= 360f) theta -= 360f;
+				else if (theta < 0f) theta += 360f;
+				float afterY = (float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight);
+				anchorDY = afterY-beforeY;
+				setY((float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight));
+			}
 		}
 		super.update();
 	}

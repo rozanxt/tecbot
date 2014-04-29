@@ -30,7 +30,7 @@ public class Player {
 		weapons[0] = new NoWeapon(sb, this);
 		weapons[1] = new PlasmaCannon(sb, this);
 		weapons[2] = new GatlingGun(sb, this);
-		weapon = 0;
+		weapon = 1;
 		trigger = false;
 		energy = 100f;
 		energyReg = 0.5f;

@@ -233,14 +233,27 @@ public class GamePanel implements IPanel {
 		CameraPort.viewGUI();
 		TextManager.renderText("FPS: " + GameCore.getFPS(), "defont", 5f, GameCore.GAME_HEIGHT - 5f, 10f, 6);
 		TextManager.renderText("Mouse Position: " + GridMap.getTileX(mp[0]) + " " + GridMap.getTileY(mp[1]), "defont", 5f, GameCore.GAME_HEIGHT - 15f, 10f, 6);
-		TextManager.renderText("Bullets: " + bullets.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
-		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
-		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);
-		TextManager.renderText("Energy: " + gamePlayer.getEnergy() + " / " + gamePlayer.getMaxEnergy(), "defont", 5f, GameCore.GAME_HEIGHT - 55f, 10f, 6);
-		TextManager.renderText("Load: " + gamePlayer.getEnergyLoad(), "defont", 5f, GameCore.GAME_HEIGHT - 65f, 10f, 6);
+		TextManager.renderText("Enemies: " + entities.size(), "defont", 5f, GameCore.GAME_HEIGHT - 25f, 10f, 6);
+		TextManager.renderText("Health: " + tecbot.getHealth() + " / " + tecbot.getMaxHealth(), "defont", 5f, GameCore.GAME_HEIGHT - 35f, 10f, 6);
+		TextManager.renderText("Energy: " + gamePlayer.getEnergy() + " / " + gamePlayer.getMaxEnergy(), "defont", 5f, GameCore.GAME_HEIGHT - 45f, 10f, 6);
+		TextManager.renderText("Load: " + gamePlayer.getEnergyLoad(), "defont", 5f, GameCore.GAME_HEIGHT - 55f, 10f, 6);
 		if (gamePlayer.isBurnedOut()) glColor4f(1f, 0f, 0f, 0.8f);
-		TextManager.renderText("Ammo: " + gamePlayer.getAmmo() + " / " + gamePlayer.getMaxAmmo(), "defont", 5f, GameCore.GAME_HEIGHT - 75f, 10f, 6);
+		TextManager.renderText("Ammo: " + gamePlayer.getAmmo() + " / " + gamePlayer.getMaxAmmo(), "defont", 5f, GameCore.GAME_HEIGHT - 65f, 10f, 6);
 		glColor4f(1f, 1f, 1f, 1f);
+		
+		if (Mouse.isGrabbed()) {
+			if (exitCount < 100) {
+				glDisable(GL_TEXTURE_2D);
+				glColor4f(0f, 0f, 0f, (100-exitCount)/100f);
+				glBegin(GL_QUADS);
+					glVertex2f(0f, 0f);
+					glVertex2f(0f, GameCore.SCR_HEIGHT);
+					glVertex2f(GameCore.SCR_WIDTH, GameCore.SCR_HEIGHT);
+					glVertex2f(GameCore.SCR_WIDTH, 0f);
+				glEnd();
+				glEnable(GL_TEXTURE_2D);
+			}
+		}
 		
 		if (!Mouse.isGrabbed()) {
 			glDisable(GL_TEXTURE_2D);
