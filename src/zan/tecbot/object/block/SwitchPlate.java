@@ -20,7 +20,7 @@ import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Shape;
 import zan.tecbot.mechanism.GridMap;
-import zan.tecbot.object.entity.BaseEntity;
+import zan.tecbot.object.entity.Tecbot;
 
 public class SwitchPlate extends SwitchBlock {
 	
@@ -41,7 +41,7 @@ public class SwitchPlate extends SwitchBlock {
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {
-		if (obj instanceof BaseEntity) {
+		if (obj instanceof Tecbot) {
 			Vector2f norm = col.normal;
 			Vector2f negnorm = new Vector2f();
 			norm.negate(negnorm);

@@ -16,9 +16,11 @@ public class MapReader {
 	
 	public MapReader(String fnm) {
 		mapDatas = new HashMap<String, MapData>();
+		HashMap<Character, TypeInfo> typeDatas = new HashMap<Character, TypeInfo>();
 		String tempMapName = "";
 		String tempMapData = "";
 		String tempWireData = "";
+		String tempTypeData = "";
 		int tempMapWidth = 0;
 		int tempMapHeight = 0;
 		boolean mapping = false;
@@ -27,7 +29,7 @@ public class MapReader {
 			String line;
 			while((line = br.readLine()) != null) {
 				if (line.length() == 0)	continue;
-				if (line.startsWith("//") || line.startsWith("##") || line.startsWith("++")) continue;
+				if (line.startsWith("//") || line.startsWith("##") || line.startsWith("++") || line.startsWith("$$")) continue;
 				
 				if (!mapping) {
 					if (line.contains("MAPBEGIN")) {
@@ -40,12 +42,22 @@ public class MapReader {
 					}
 				} else {
 					if (line.contains("MAPEND")) {
-						mapDatas.put(tempMapName, new MapData(tempMapName, tempMapData, tempWireData, tempMapWidth, tempMapHeight));
+						mapDatas.put(tempMapName, new MapData(tempMapName, tempMapData, tempWireData, tempTypeData, typeDatas, tempMapWidth, tempMapHeight));
 						mapping = false;
 					} else if (line.startsWith("#")) {
 						tempMapData += line.substring(1, line.length()-1);
 					} else if (line.startsWith("+")) {
 						tempWireData += line.substring(1, line.length()-1);
+					} else if (line.startsWith("$")) {
+						tempTypeData += line.substring(1, line.length()-1);
+					} else if (line.startsWith(">")) {
+						Character id = line.charAt(1);
+						if (id != null) {
+							TypeInfo info = new TypeInfo();
+							String[] tkns = GameUtility.split(line);
+							for (int i=1;i<tkns.length;i++) info.add(tkns[i]);
+							typeDatas.put(id, info);
+						}
 					} else {
 						String[] tkns = GameUtility.split(line);
 						for (int i=0;i<tkns.length;i++) {

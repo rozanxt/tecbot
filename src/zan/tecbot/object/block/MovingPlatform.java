@@ -30,16 +30,19 @@ public class MovingPlatform extends Block {
 	public MovingPlatform(int sx, int sy) {
 		super(sx, sy);
 		shape = new Shape();
-		shape.addPoint(0f, 1f/3f);
-		shape.addPoint(0f, 2f/3f);
-		shape.addPoint(1f, 2f/3f);
-		shape.addPoint(1f, 1f/3f);
+		shape.addPoint(-1f, 0f);
+		shape.addPoint(-1f, 1f);
+		shape.addPoint(2f, 1f);
+		shape.addPoint(2f, 0f);
 		shape.fix();
 		setSolid(true);
 		setPowered(true);
 		theta = 0f;
 		anchorDX = anchorDY = 0f;
 	}
+	
+	public void setTheta(float st) {theta = st;}
+	public float getTheta() {return theta;}
 	
 	public float getAnchorDX() {return anchorDX;}
 	public float getAnchorDY() {return anchorDY;}
@@ -60,24 +63,26 @@ public class MovingPlatform extends Block {
 	}
 	
 	public void update() {
-		if (isPowered()) {
-			if (getType() == 0) {
+		if (getType() == 0) {
+			if (isPowered()) {
 				float beforeX = (float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth);
 				theta += 1f;
 				if (theta >= 360f) theta -= 360f;
 				else if (theta < 0f) theta += 360f;
 				float afterX = (float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth);
 				anchorDX = afterX-beforeX;
-				setX((float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth));
-			} else if (getType() == 1) {
+			}
+			setX((float)(GridMap.getGameX(getTileX())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileWidth));
+		} else if (getType() == 1) {
+			if (isPowered()) {
 				float beforeY = (float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight);
 				theta += 1f;
 				if (theta >= 360f) theta -= 360f;
 				else if (theta < 0f) theta += 360f;
 				float afterY = (float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight);
 				anchorDY = afterY-beforeY;
-				setY((float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight));
 			}
+			setY((float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight));
 		}
 		super.update();
 	}
@@ -102,10 +107,10 @@ public class MovingPlatform extends Block {
 		if (isPowered()) glColor4f(0f, 1f, 1f, 1f);
 		else glColor4f(1f, 0f, 0f, 1f);
 		glBegin(GL_LINE_LOOP);
-			glVertex2f(-1f/12f, -1f/12f);
-			glVertex2f(-1f/12f, 1f/12f);
-			glVertex2f(1f/12f, 1f/12f);
-			glVertex2f(1f/12f, -1f/12f);
+			glVertex2f(-0.25f, -0.25f);
+			glVertex2f(-0.25f, 0.25f);
+			glVertex2f(0.25f, 0.25f);
+			glVertex2f(0.25f, -0.25f);
 		glEnd();
 		glColor4f(1f, 1f, 1f, 1f);
 		
