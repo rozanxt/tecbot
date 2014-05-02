@@ -29,6 +29,7 @@ public class SpikeBlock extends Block {
 		shape.addPoint(1f, 0f);
 		shape.fix();
 		setSolid(false);
+		setPowered(true);
 	}
 	
 	public void render() {

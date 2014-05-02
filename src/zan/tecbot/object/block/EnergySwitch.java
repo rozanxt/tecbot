@@ -39,12 +39,10 @@ public class EnergySwitch extends SwitchBlock {
 	public boolean collide(BaseObject obj, Collision col) {
 		if (obj instanceof PlasmaBullet) {
 			PlasmaBullet o = (PlasmaBullet)obj;
-			if (o.isFullyLoaded()) {
-				if (switchAble) {
-					if (isPowered()) setPowered(false);
-					else setPowered(true);
-				} else setPowered(true);
-			}
+			if (playerOnly && !o.isPlayerBullet()) return false;
+			if (getType() == 0 && !o.isFullyLoaded()) return false;
+			switchPower();
+			return true;
 		}
 		return false;
 	}

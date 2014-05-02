@@ -25,13 +25,9 @@ public class BumperBlock extends Block {
 	
 	public boolean collide(BaseObject obj, Collision col) {
 		if (isPowered() && obj instanceof BaseEntity) {
-			Vector2f norm = col.normal;
-			Vector2f negnorm = new Vector2f();
-			norm.negate(negnorm);
-			
-			if (col.normFriction() && negnorm.y > 0f && obj.getSupportPoint(negnorm).y >= getSupportPoint(norm).y && obj.getDY() < 0f) {
+			if (hitSide(obj, col) == side) {
 		 		BaseEntity entity = (BaseEntity) obj;
-		 		entity.bump();
+		 		entity.bump(side);
 		 		return true;
 			}
 		}

@@ -39,7 +39,7 @@ public class DoorBlock extends Block {
 	}
 	
 	public void render() {
-		if (!isPowered()) {
+		if (isSolid()) {
 			glDisable(GL_TEXTURE_2D);
 			glPushMatrix();
 			

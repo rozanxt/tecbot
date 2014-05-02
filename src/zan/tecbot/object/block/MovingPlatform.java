@@ -24,11 +24,14 @@ import zan.tecbot.object.entity.BaseEntity;
 
 public class MovingPlatform extends Block {
 	
+	protected GridMap gridMap;
+	
 	protected float theta;
 	protected float anchorDX, anchorDY;
 	
-	public MovingPlatform(int sx, int sy) {
+	public MovingPlatform(int sx, int sy, GridMap gm) {
 		super(sx, sy);
+		gridMap = gm;
 		shape = new Shape();
 		shape.addPoint(-1f, 0f);
 		shape.addPoint(-1f, 1f);
@@ -84,6 +87,11 @@ public class MovingPlatform extends Block {
 			}
 			setY((float)(GridMap.getGameY(getTileY())+Math.sin(theta*(Math.PI/180f))*3*GridMap.tileHeight));
 		}
+		int tx = GridMap.getTileX(getX());
+		int ty = GridMap.getTileY(getY());
+		gridMap.addTempSolid(tx, ty);
+		gridMap.addTempSolid(tx+1, ty);
+		gridMap.addTempSolid(tx-1, ty);
 		super.update();
 	}
 	

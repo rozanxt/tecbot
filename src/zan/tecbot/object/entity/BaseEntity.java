@@ -124,38 +124,55 @@ public abstract class BaseEntity extends BaseObject {
 			if (obj instanceof Block) {
 				Block b = (Block)obj;
 				if (b.isSolid()) {
-					Vector2f norm = col.normal;
-					Vector2f negnorm = new Vector2f();
-					norm.negate(negnorm);
-					
-					if (col.normFriction() && norm.y > 0f && getSupportPoint(norm).y >= obj.getSupportPoint(negnorm).y && getDY() < 0f) ground = true;
-					if (norm.y < 0f && getSupportPoint(norm).y <= obj.getSupportPoint(negnorm).y && getDY() > 0f) setDY(0f);
-					
-					// QUICK FIX
-					if (!col.normFriction()) {
+					if (b.isBottomPass()) {
+						Vector2f norm = col.normal;
 						Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
-						if (foot.y >= obj.getGroundSupportPoint(foot).y-15f) {
+						
+						if (col.normFriction() && norm.y > 0f && foot.y >= obj.getGroundSupportPoint(foot).y-15f && getDY() < 0f) {
+							ground = true;
 							setY(getY()+norm.y*(1f-col.distance));
-						} else {
-							setX(getX()+norm.x*(1f-col.distance));
+							if (!moving) setDX(getDX()*0.7f);
 						}
-						if (anchor != null) {anchorX = getX()-anchor.getX();}
-					}
-					if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
-					
-					if (!moving) setDX(getDX()*0.7f);
-					
-					if (col.distance < -15f) {
-						if (col.normFriction()) {
-							if (norm.y > 0f) squashUp = true;
-							else if(norm.y < 0f) squashDown = true;
-						} else {
-							if (norm.x > 0f) squashRight = true;
-							else if(norm.x < 0f) squashLeft = true;
+						
+						if (col.distance < -15f) {
+							if (col.normFriction()) {
+								if (norm.y > 0f) squashDown = true;
+							}
 						}
+						
+					} else {
+						Vector2f norm = col.normal;
+						
+						if (col.normFriction() && norm.y > 0f && getDY() < 0f) ground = true;
+						if (norm.y < 0f && getDY() > 0f) setDY(0f);
+						
+						if (col.normFriction()) setY(getY()+norm.y*(1f-col.distance));
+						else {
+							Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
+							if (foot.y >= obj.getGroundSupportPoint(foot).y-15f) {
+								setY(getY()+norm.y*(1f-col.distance));
+							} else {
+								setX(getX()+norm.x*(1f-col.distance));
+							}
+							if (anchor != null) {anchorX = getX()-anchor.getX();}
+						}
+						
+						if (col.distance < -15f) {
+							if (col.normFriction()) {
+								if (norm.y > 0f) squashDown = true;
+								else if(norm.y < 0f) squashUp = true;
+							} else {
+								if (norm.x > 0f) squashLeft = true;
+								else if(norm.x < 0f) squashRight = true;
+							}
+						}
+						
+						if (!moving) setDX(getDX()*0.7f);
 					}
 				}
-				if (obj instanceof SpikeBlock) {die();}
+				if (obj instanceof SpikeBlock) {
+					if (b.isPowered()) die();
+				}
 			}
 			return true;
 		}
@@ -187,9 +204,12 @@ public abstract class BaseEntity extends BaseObject {
 		onground = false;
 	}
 	
-	public void bump() {
+	public void bump(int side) {
 		if (isAlive()) {
-			applyForceY(9f);
+			if (side == 1) applyForce(8f, 4f);
+			else if (side == 2) applyForceY(-4f);
+			else if (side == 3) applyForce(-8f, 4f);
+			else applyForceY(9f);
 			setDY(0f);
 			ground = false;
 			onground = false;

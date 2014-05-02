@@ -95,6 +95,14 @@ public class GamePanel implements IPanel {
 			if (tecbot.isActive()) tecbot.update();
 			else gamePlayer.respawn();
 			
+			for (int i=0;i<blocks.size();i++) {
+				if (i >= blocks.size()) break;
+				if (blocks.get(i).isActive()) blocks.get(i).update();
+				else {
+					gridMap.removeBlock(blocks.get(i).getTileX(), blocks.get(i).getTileY());
+					blocks.remove(i); i--;
+				}
+			}
 			for (int i=0;i<entities.size();i++) {
 				if (i >= entities.size()) break;
 				if (entities.get(i).isActive()) entities.get(i).update();
@@ -104,14 +112,6 @@ public class GamePanel implements IPanel {
 				if (i >= bullets.size()) break;
 				if (bullets.get(i).isActive()) bullets.get(i).update();
 				else {bullets.remove(i); i--;}
-			}
-			for (int i=0;i<blocks.size();i++) {
-				if (i >= blocks.size()) break;
-				if (blocks.get(i).isActive()) blocks.get(i).update();
-				else {
-					gridMap.removeBlock(blocks.get(i).getTileX(), blocks.get(i).getTileY());
-					blocks.remove(i); i--;
-				}
 			}
 			for (int i=0;i<collectibles.size();i++) {
 				if (i >= collectibles.size()) break;
@@ -144,6 +144,7 @@ public class GamePanel implements IPanel {
 			for (int i=0;i<bullets.size();i++) if (bullets.get(i).isActive()) bullets.get(i).correction();
 			for (int i=0;i<blocks.size();i++) if (blocks.get(i).isActive()) blocks.get(i).correction();
 			for (int i=0;i<collectibles.size();i++) if (collectibles.get(i).isActive()) collectibles.get(i).correction();
+			gridMap.clear();
 			
 			if (gridMap.requestMapChange()) {
 				createMap();

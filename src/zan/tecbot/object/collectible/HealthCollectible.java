@@ -18,11 +18,12 @@ public class HealthCollectible extends Collectible {
 		shape.addPoint(0.5f, 0f);
 		shape.addPoint(0f, 0.5f);
 		shape.fix();
+		setValue(50f);
 	}
 	
 	public void collected() {
 		if (collector.getHealth() >= collector.getMaxHealth()) return;
-		collector.healDamage(50f);
+		collector.healDamage(getValue());
 		super.collected();
 	}
 	

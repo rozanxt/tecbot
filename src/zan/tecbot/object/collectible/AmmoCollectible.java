@@ -14,12 +14,13 @@ public class AmmoCollectible extends Collectible {
 		shape.addPoint(1f, 0.5f);
 		shape.addPoint(0.5f, 0f);
 		shape.fix();
-		recurTime = 30*60;
+		setValue(300f);
+		setRecurTime(30*60);
 	}
 	
 	public void collected() {
 		if (collector.getAmmo() >= collector.getMaxAmmo()) return;
-		collector.addAmmo(300);
+		collector.addAmmo((int)getValue());
 		super.collected();
 	}
 	

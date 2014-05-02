@@ -9,16 +9,24 @@ public abstract class Collectible extends BaseObject {
 	
 	protected Player collector;
 	
+	protected float value;
+	
 	protected boolean recur;
 	protected int recurTime;
 	protected int recurCount;
 	
 	public Collectible(Player sc) {
 		collector = sc;
+		value = 0;
 		recur = false;
 		recurTime = 0;
 		recurCount = 0;
 	}
+	
+	public void setValue(float sv) {value = sv;}
+	public float getValue() {return value;}
+	
+	public void setRecurTime(int rt) {recurTime = rt;}
 	
 	public void collected() {
 		if (recurTime > 0) {

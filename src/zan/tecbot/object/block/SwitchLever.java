@@ -40,12 +40,7 @@ public class SwitchLever extends SwitchBlock {
 	public void update() {
 		super.update();
 		if (onLever) {
-			if (InputManager.isKeyPressed(Keyboard.KEY_SPACE)) {
-				if (isSwitchAble()) {
-					if (isPowered()) setPowered(false);
-					else setPowered(true);
-				} else setPowered(false);
-			}
+			if (InputManager.isKeyPressed(Keyboard.KEY_SPACE)) switchPower();
 			onLever = false;
 		}
 	}
@@ -58,7 +53,7 @@ public class SwitchLever extends SwitchBlock {
 		glScalef(size, size, 0f);
 		glRotatef(-angle, 0f, 0f, 1f);
 		
-		if (highlight) glColor4f(0f, 0f, 1f, 1f);
+		if (onLever) glColor4f(1f, 0f, 1f, 1f);
 		glBegin(GL_LINE_LOOP);
 			for (int i=0;i<shape.getNumPoints();i++) {
 				Vector2f vertex = shape.getPoint(i);

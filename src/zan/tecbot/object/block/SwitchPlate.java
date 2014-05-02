@@ -1,18 +1,6 @@
 package zan.tecbot.object.block;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex2f;
+import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.util.vector.Vector2f;
 
@@ -20,12 +8,13 @@ import zan.game.object.BaseObject;
 import zan.game.object.Collision;
 import zan.game.object.Shape;
 import zan.tecbot.mechanism.GridMap;
+import zan.tecbot.object.entity.BaseEntity;
 import zan.tecbot.object.entity.Tecbot;
 
 public class SwitchPlate extends SwitchBlock {
 	
 	protected boolean onPlate;
-	protected boolean wasOnPlate;
+	protected int wasOnPlate;
 	
 	public SwitchPlate(int sx, int sy, GridMap gm) {
 		super(sx, sy, gm);
@@ -38,23 +27,18 @@ public class SwitchPlate extends SwitchBlock {
 		setSolid(true);
 		setSwitchAble(true);
 		onPlate = false;
+		wasOnPlate = 0;
 	}
 	
 	public boolean collide(BaseObject obj, Collision col) {
-		if (obj instanceof Tecbot) {
-			Vector2f norm = col.normal;
-			Vector2f negnorm = new Vector2f();
-			norm.negate(negnorm);
-			
-			if (col.normFriction() && negnorm.y > 0f && obj.getSupportPoint(negnorm).y >= getSupportPoint(norm).y && obj.getDY() < 0f) {
+		if (obj instanceof BaseEntity) {
+			if (playerOnly && !(obj instanceof Tecbot)) return false;
+			if (hitSide(obj, col) == side) {
 		 		if (!onPlate) {
-		 			if (isSwitchAble()) {
-		 				if (isPowered()) setPowered(false);
-		 				else setPowered(true);
-		 			} else setPowered(true);
+		 			switchPower();
 		 			onPlate = true;
 		 		}
-		 		wasOnPlate = true;
+		 		wasOnPlate = 20;
 		 		return true;
 			}
 		}
@@ -63,8 +47,8 @@ public class SwitchPlate extends SwitchBlock {
 	
 	public void update() {
 		super.update();
-		if (onPlate && !wasOnPlate) onPlate = false;
-		wasOnPlate = false;
+		if (wasOnPlate > 0) wasOnPlate--;
+		if (onPlate && wasOnPlate == 0) onPlate = false;
 	}
 	
 	public void render() {

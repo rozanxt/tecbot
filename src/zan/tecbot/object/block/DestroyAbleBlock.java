@@ -34,6 +34,7 @@ public class DestroyAbleBlock extends Block {
 		health = 20f;
 	}
 	
+	public void setHealth(float sh) {health = sh;}
 	public void inflictDamage(float sd) {health -= sd;}
 	
 	public void update() {

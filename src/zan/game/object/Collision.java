@@ -18,6 +18,7 @@ public class Collision {
 		b = null;
 		distance = 0f;
 		normal = null;
+		contact = null;
 	}
 	
 	public boolean normFriction() {

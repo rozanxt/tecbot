@@ -27,6 +27,7 @@ public class GridMap {
 	
 	private Block[][] tiles;
 	private ArrayList<Block> wires;
+	private ArrayList<TileCoord> tempSolid;
 	
 	private boolean inExit;
 	private boolean requestMapChange;
@@ -39,6 +40,7 @@ public class GridMap {
 		nextMap = "";
 		tiles = null;
 		wires = new ArrayList<Block>();
+		tempSolid = new ArrayList<TileCoord>();
 		inExit = false;
 		requestMapChange = false;
 		playerSpawn = new Vector2f(0f, 0f);
@@ -50,6 +52,10 @@ public class GridMap {
 			tiles = null;
 		}
 		wires.clear();
+	}
+	
+	public void clear() {
+		tempSolid.clear();
 	}
 	
 	public void initPlayerSpawn() {
@@ -116,6 +122,10 @@ public class GridMap {
 		return false;
 	}
 	
+	public void addTempSolid(int sx, int sy) {
+		tempSolid.add(new TileCoord(sx, sy));
+	}
+	
 	public Block getBlock(int sx, int sy) {
 		if (sx < 0 || sy < 0 || sx >= mapData.getMapWidth() || sy >= mapData.getMapHeight()) return null;
 		return tiles[sx][sy];
@@ -123,7 +133,11 @@ public class GridMap {
 	public boolean isSolidBlock(int sx, int sy) {
 		if (sx < 0 || sy < 0 || sx >= mapData.getMapWidth() || sy >= mapData.getMapHeight()) return false;
 		Block block = tiles[sx][sy];
-		if (block != null && block.isActive() && block.isSolid()) return true;
+		if (block != null && block.isActive() && block.isSolid() && !(block instanceof MovingPlatform)) return true;
+		for (int i=0;i<tempSolid.size();i++) {
+			TileCoord ts = tempSolid.get(i);
+			if (ts.getTileX() == sx && ts.getTileY() == sy) return true;
+		}
 		return false;
 	}
 	public boolean isSolidBlockType(int sx, int sy, int st) {
@@ -133,7 +147,11 @@ public class GridMap {
 			if (block instanceof SolidBlock) {
 				SolidBlock b = (SolidBlock)block;
 				if (b.getType() == st) return true;
-			} else if (st == 0) return true;
+			} else if (st == 0 && !(block instanceof MovingPlatform)) return true;
+		}
+		for (int i=0;i<tempSolid.size();i++) {
+			TileCoord ts = tempSolid.get(i);
+			if (ts.getTileX() == sx && ts.getTileY() == sy) return true;
 		}
 		return false;
 	}
@@ -205,7 +223,7 @@ public class GridMap {
 				int tx = i;
 				int ty = mapHeight-j-1;
 				
-				String blockCodes = "0123456789OBMDLPEYTWQ";
+				String blockCodes = "0123456789-OBMDLPEYTWQ";
 				String entityCodes = "ert";
 				String collectCodes = "ah";
 				
@@ -225,6 +243,9 @@ public class GridMap {
 					} else if (code == '4') {
 						SolidBlock b = new SolidBlock(tx, ty, 4);
 						blocks.add(b);
+					} else if (code == '-') {
+						SlabBlock b = new SlabBlock(tx, ty);
+						blocks.add(b);
 					} else if (code == 'O') {
 						DestroyAbleBlock b = new DestroyAbleBlock(tx, ty);
 						blocks.add(b);
@@ -232,7 +253,7 @@ public class GridMap {
 						BumperBlock b = new BumperBlock(tx, ty);
 						blocks.add(b);
 					} else if (code == 'M') {
-						MovingPlatform b = new MovingPlatform(tx, ty);
+						MovingPlatform b = new MovingPlatform(tx, ty, this);
 						char tid = getTypeID(tx, ty);
 						if (tid != ' ') if (hasAttribute(tid, "theta")) b.setTheta(getAttribute(tid, "theta"));
 						blocks.add(b);
@@ -270,10 +291,16 @@ public class GridMap {
 					char tid = getTypeID(tx, ty);
 					if (tid != ' ') {
 						if (hasAttribute(tid, "type")) b.setType(getAttribute(tid, "type"));
+						if (hasAttribute(tid, "side")) b.setSide(getAttribute(tid, "side"));
 						if (hasAttribute(tid, "inv")) {
 							int inv = getAttribute(tid, "inv");
 							if (inv == 0) b.setInverse(false);
 							else b.setInverse(true);
+						}
+						if (hasAttribute(tid, "plonly")) {
+							int plo = getAttribute(tid, "plonly");
+							if (plo == 0) b.setPlayerOnly(false);
+							else b.setPlayerOnly(true);
 						}
 						if (b instanceof SwitchBlock) {
 							SwitchBlock s = (SwitchBlock)b;
@@ -284,6 +311,12 @@ public class GridMap {
 							}
 							if (hasAttribute(tid, "timer")) {
 								s.setSwitchTimer(getAttribute(tid, "timer"));
+							}
+						}
+						if (b instanceof DestroyAbleBlock) {
+							DestroyAbleBlock d = (DestroyAbleBlock)b;
+							if (hasAttribute(tid, "health")) {
+								d.setHealth(getAttribute(tid, "switch"));
 							}
 						}
 					}
@@ -320,158 +353,13 @@ public class GridMap {
 					Collectible c = collectibles.get(collectibles.size()-1);
 					c.setPos(gx, gy);
 					c.spawn();
-				}
-				
-				/*
-				if (code == 'x') {
-					GummBot e = new GummBot(this);
-					e.setPos(gx, gy);
-					e.spawn();
-					entities.add(e);
-				} else if (code == 'c') {
-					HuntBot e = new HuntBot(bullets, this);
-					e.setPos(gx, gy);
-					e.setTarget(gamePlayer.getTecbot());
-					e.spawn();
-					entities.add(e);
-				} else if (code == 'v') {
-					ShotBot e = new ShotBot(bullets, this);
-					e.setPos(gx, gy);
-					e.setTarget(gamePlayer.getTecbot());
-					e.spawn();
-					entities.add(e);
-				} else if (code == '0') {
-					SolidBlock b = new SolidBlock(i, mapHeight-j-1, 0);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == '1') {
-					SolidBlock b = new SolidBlock(i, mapHeight-j-1, 1);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == '2') {
-					Block b = new SolidBlock(i, mapHeight-j-1, 2);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == '3') {
-					Block b = new SolidBlock(i, mapHeight-j-1, 3);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == '4') {
-					Block b = new SolidBlock(i, mapHeight-j-1, 4);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == '5') {
-					BumperBlock b = new BumperBlock(i, mapHeight-j-1);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					giveWireID(b, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == 'O') {
-					DestroyAbleBlock b = new DestroyAbleBlock(i, mapHeight-j-1);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == '*') {
-					SpikeBlock b = new SpikeBlock(i, mapHeight-j-1);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					giveWireID(b, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == 'm') {
-					MovingPlatform b = new MovingPlatform(i, mapHeight-j-1);
-					b.setPos(gx, gy);
-					b.setSize(tileSize*3f);
-					b.setType(0);
-					if (getTypeID(i, mapHeight-j-1) != ' ') {
-						if (mapData.getTypeInfo().get(getTypeID(i, mapHeight-j-1)) != null) {
-							if (mapData.getTypeInfo().get(getTypeID(i, mapHeight-j-1)).get("type") != null) {
-								b.setType(mapData.getTypeInfo().get(getTypeID(i, mapHeight-j-1)).get("type"));
-							}
-						}
+					
+					char tid = getTypeID(tx, ty);
+					if (tid != ' ') {
+						if (hasAttribute(tid, "value")) c.setValue(getAttribute(tid, "value"));
+						if (hasAttribute(tid, "recur")) c.setRecurTime(getAttribute(tid, "recur"));
 					}
-					b.spawn();
-					blocks.add(b);
-					giveWireID(b, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == 'd') {
-					DoorBlock b = new DoorBlock(i, mapHeight-j-1);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					giveWireID(b, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == 'e') {
-					EnergySwitch b = new EnergySwitch(i, mapHeight-j-1, this);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					giveWireID(b, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == 'p') {
-					SwitchPlate b = new SwitchPlate(i, mapHeight-j-1, this);
-					b.setPos(gx, gy);
-					b.setSize(tileSize);
-					b.spawn();
-					blocks.add(b);
-					giveWireID(b, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = b;
-				} else if (code == 'a') {
-					AmmoCollectible c = new AmmoCollectible(gamePlayer);
-					c.setPos(gx, gy);
-					c.spawn();
-					collectibles.add(c);
-				} else if (code == 'h') {
-					HealthCollectible c = new HealthCollectible(gamePlayer);
-					c.setPos(gx, gy);
-					c.spawn();
-					collectibles.add(c);
-				} else if (code == 't') {
-					TelePort x = new TelePort(i, mapHeight-j-1, this);
-					x.setPos(gx, gy);
-					x.setSize(tileSize);
-					x.spawn();
-					blocks.add(x);
-					giveWireID(x, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = x;
-				} else if (code == 'w') {
-					MapPort x = new MapPort(i, mapHeight-j-1, this);
-					x.setPos(gx, gy);
-					x.setSize(tileSize);
-					x.spawn();
-					blocks.add(x);
-					giveWireID(x, i, mapHeight-j-1);
-					tiles[i][mapHeight-j-1] = x;
-				} else if (code == 'q') {
-					ExitArea x = new ExitArea(i, mapHeight-j-1, this);
-					x.setPos(gx, gy);
-					x.setSize(tileSize);
-					x.spawn();
-					blocks.add(x);
-					tiles[i][mapHeight-j-1] = x;
-				}*/
+				}
 			}
 		}
 		checkWires();

@@ -13,7 +13,7 @@ public class SwitchBlock extends Block {
 	public SwitchBlock(int sx, int sy, GridMap gm) {
 		super(sx, sy);
 		gridMap = gm;
-		setPowered(false);
+		powered = false;
 		switchAble = false;
 		switchTimer = 0;
 		switchCount = 0;
@@ -24,8 +24,11 @@ public class SwitchBlock extends Block {
 	
 	public void setSwitchTimer(int st) {switchTimer = st;}
 	
-	public void setPowered(boolean sp) {
-		super.setPowered(sp);
+	public void switchPower() {
+		if (isSwitchAble()) {
+			if (isPowered()) setPowered(false);
+			else setPowered(true);
+		} else setPowered(true);
 		if (switchTimer > 0 && isPowered()) switchCount = switchTimer;
 		gridMap.checkWire(getWireID());
 	}
