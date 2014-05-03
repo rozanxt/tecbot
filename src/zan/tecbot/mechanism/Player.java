@@ -16,6 +16,7 @@ public class Player {
 	protected Tecbot tecbot;
 	
 	protected Weapon[] weapons;
+	protected boolean[] weaponsAllowed;
 	protected int weapon;
 	protected boolean trigger;
 	protected float energy;
@@ -38,6 +39,7 @@ public class Player {
 		maxEnergy = 200f;
 		playerLife = 3;
 		playerSpawn = new Vector2f(0f, 0f);
+		weaponsAllowed = new boolean[10];
 	}
 	
 	public void spawn() {
@@ -69,6 +71,18 @@ public class Player {
 	
 	public void setWeapon(int sw) {weapon = sw;}
 	public int getWeapon() {return weapon;}
+	
+	public void setWeaponsAllowed(boolean[] wa) {
+		for (int i=0;i<wa.length;i++) setWeaponAllowed(i, wa[i]);
+	}
+	public void setWeaponAllowed(int sw, boolean sa) {
+		if (sw < 0 || sw >= weaponsAllowed.length) return;
+		weaponsAllowed[sw] = sa;
+	}
+	public boolean isWeaponAllowed(int sw) {
+		if (sw < 0 || sw >= weaponsAllowed.length) return false;
+		return weaponsAllowed[sw];
+	}
 	
 	public void healDamage(float sh) {
 		tecbot.healDamage(sh);
@@ -115,22 +129,23 @@ public class Player {
 				if (event.isButtonDown()) {
 					if (event.isButton(0)) {
 						trigger = true;
-						weapons[weapon].trigger();
+						if (weaponsAllowed[weapon]) weapons[weapon].trigger();
 					}
 				} else {
 					if (event.isButton(0)) {
 						trigger = false;
-						weapons[weapon].release();
+						if (weaponsAllowed[weapon]) weapons[weapon].release();
 					}
 				}
 			}
 			
-			if (trigger) weapons[weapon].onTrigger();
-			else {
-				weapons[weapon].onRelease();
-				if (InputManager.isKeyPressed(Keyboard.KEY_0)) setWeapon(0);
-				else if (InputManager.isKeyPressed(Keyboard.KEY_1)) setWeapon(1);
-				else if (InputManager.isKeyPressed(Keyboard.KEY_2)) setWeapon(2);
+			if (trigger) {
+				if (weaponsAllowed[weapon]) weapons[weapon].onTrigger();
+			} else {
+				if (weaponsAllowed[weapon]) weapons[weapon].onRelease();
+				if (InputManager.isKeyPressed(Keyboard.KEY_0) && weaponsAllowed[0]) setWeapon(0);
+				else if (InputManager.isKeyPressed(Keyboard.KEY_1) && weaponsAllowed[1]) setWeapon(1);
+				else if (InputManager.isKeyPressed(Keyboard.KEY_2) && weaponsAllowed[2]) setWeapon(2);
 			}
 			
 			for (int i=0;i<weapons.length;i++) weapons[i].update();

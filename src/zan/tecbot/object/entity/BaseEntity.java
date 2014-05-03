@@ -27,6 +27,7 @@ public abstract class BaseEntity extends BaseObject {
 	protected MovingPlatform anchor;
 	protected float anchorX;
 	protected boolean squashUp, squashDown, squashLeft, squashRight;
+	protected int passBottom;
 	
 	public BaseEntity() {
 		super();
@@ -42,6 +43,7 @@ public abstract class BaseEntity extends BaseObject {
 		anchor = null;
 		anchorX = 0f;
 		squashUp = squashDown = squashLeft = squashRight = false;
+		passBottom = 0;
 	}
 	
 	public void spawn() {
@@ -128,7 +130,7 @@ public abstract class BaseEntity extends BaseObject {
 						Vector2f norm = col.normal;
 						Vector2f foot = getSupportPoint(new Vector2f(0f, -1f));
 						
-						if (col.normFriction() && norm.y > 0f && foot.y >= obj.getGroundSupportPoint(foot).y-15f && getDY() < 0f) {
+						if (passBottom == 0 && col.normFriction() && norm.y > 0f && foot.y >= obj.getGroundSupportPoint(foot).y-15f && getDY() < 0f) {
 							ground = true;
 							setY(getY()+norm.y*(1f-col.distance));
 							if (!moving) setDX(getDX()*0.7f);
@@ -196,6 +198,7 @@ public abstract class BaseEntity extends BaseObject {
 	public void moveLeft() {applyForceX(-0.5f);	moving = true;}
 	public void airRight() {applyForceX(0.1f);}
 	public void airLeft() {applyForceX(-0.1f);}
+	public void passBottom() {passBottom = 20;}
 	
 	public void jump() {
 		setDY(0f);
@@ -228,6 +231,7 @@ public abstract class BaseEntity extends BaseObject {
 			if (health <= 0f) die();
 			if ((squashUp && squashDown) || (squashLeft && squashRight)) die();
 			squashUp = squashDown = squashLeft = squashRight = false;
+			if (passBottom > 0) passBottom--;
 		}
 		if (isOutOfBound()) {
 			if (isAlive()) inflictDamage(3f);

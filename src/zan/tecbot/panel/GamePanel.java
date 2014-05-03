@@ -80,6 +80,7 @@ public class GamePanel implements IPanel {
 		
 		gridMap.changeMap();
 		gridMap.createMap(gamePlayer, blocks, entities, bullets, collectibles);
+		gamePlayer.setWeaponsAllowed(gridMap.getWeaponsAllowed());
 	}
 	
 	public void endGame() {

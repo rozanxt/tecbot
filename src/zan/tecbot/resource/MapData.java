@@ -9,7 +9,9 @@ public class MapData {
 	private HashMap<Character, TypeInfo> typeInfo;
 	private int mapWidth, mapHeight;
 	
-	public MapData(String mn, String md, String wd, String td, HashMap<Character, TypeInfo> ti, int mw, int mh) {
+	private boolean[] weaponsAllowed;
+	
+	public MapData(String mn, String md, String wd, String td, HashMap<Character, TypeInfo> ti, int mw, int mh, boolean[] wa) {
 		setMapName(mn);
 		setMapData(md);
 		setWireData(wd);
@@ -17,6 +19,7 @@ public class MapData {
 		setTypeInfo(ti);
 		setMapWidth(mw);
 		setMapHeight(mh);
+		weaponsAllowed = wa;
 	}
 	
 	public boolean isValid() {
@@ -41,5 +44,7 @@ public class MapData {
 	public int getMapWidth() {return mapWidth;}
 	public void setMapHeight(int mh) {mapHeight = mh;}
 	public int getMapHeight() {return mapHeight;}
+	
+	public boolean[] getWeaponsAllowed() {return weaponsAllowed;}
 	
 }

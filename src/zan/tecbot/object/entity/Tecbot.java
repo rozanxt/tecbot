@@ -112,6 +112,7 @@ public class Tecbot extends BaseEntity {
 				if (InputManager.isKeyDown(Keyboard.KEY_W)) {jump();}
 				if (InputManager.isKeyDown(Keyboard.KEY_D)) {moveRight();}
 				if (InputManager.isKeyDown(Keyboard.KEY_A)) {moveLeft();}
+				if (InputManager.isKeyPressed(Keyboard.KEY_S)) {passBottom();}
 			} else {
 				applyGravity();
 				if (InputManager.isKeyDown(Keyboard.KEY_D)) {airRight();}

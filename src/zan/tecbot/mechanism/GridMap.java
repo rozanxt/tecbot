@@ -210,6 +210,8 @@ public class GridMap {
 		for (int i=0;i<wireIDs.size();i++) checkWire(wireIDs.get(i));
 	}
 	
+	public boolean[] getWeaponsAllowed() {return mapData.getWeaponsAllowed();}
+	
 	public void createMap(Player gamePlayer, ArrayList<Block> blocks, ArrayList<BaseEntity> entities, ArrayList<Bullet> bullets, ArrayList<Collectible> collectibles) {
 		if (mapData == null || !mapData.isValid()) return;
 		int mapWidth = mapData.getMapWidth();

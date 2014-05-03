@@ -23,6 +23,9 @@ public class MapReader {
 		String tempTypeData = "";
 		int tempMapWidth = 0;
 		int tempMapHeight = 0;
+		boolean[] tempWeapons = new boolean[10];
+		for (int i=0;i<tempWeapons.length;i++) tempWeapons[i] = false;
+		tempWeapons[0] = true;
 		boolean mapping = false;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(RES_DIR + fnm));
@@ -42,7 +45,7 @@ public class MapReader {
 					}
 				} else {
 					if (line.contains("MAPEND")) {
-						mapDatas.put(tempMapName, new MapData(tempMapName, tempMapData, tempWireData, tempTypeData, typeDatas, tempMapWidth, tempMapHeight));
+						mapDatas.put(tempMapName, new MapData(tempMapName, tempMapData, tempWireData, tempTypeData, typeDatas, tempMapWidth, tempMapHeight, tempWeapons));
 						mapping = false;
 					} else if (line.startsWith("#")) {
 						tempMapData += line.substring(1, line.length()-1);
@@ -63,14 +66,20 @@ public class MapReader {
 						for (int i=0;i<tkns.length;i++) {
 							if (tkns[i].contains("=")) {
 								int pos = tkns[i].indexOf("=")+1;
-								if (tkns[i].startsWith("map")) {
+								if (tkns[i].startsWith("map=")) {
 									tempMapName = tkns[i].substring(pos);
-								} else if (tkns[i].startsWith("w")) {
+								} else if (tkns[i].startsWith("w=")) {
 									String w = tkns[i].substring(pos);
 									if (GameUtility.isIntegerString(w)) tempMapWidth = Integer.parseInt(w);
-								} else if (tkns[i].startsWith("h")) {
+								} else if (tkns[i].startsWith("h=")) {
 									String h = tkns[i].substring(pos);
 									if (GameUtility.isIntegerString(h)) tempMapHeight = Integer.parseInt(h);
+								} else if (tkns[i].startsWith("weapons=")) {
+									String wpns = tkns[i].substring(pos);
+									for (int j=0;j<tempWeapons.length;j++) {
+										char wpn = Character.forDigit(j, 10);
+										if (wpns.indexOf(wpn) != -1) tempWeapons[j] = true;
+									}
 								}
 							}
 						}
