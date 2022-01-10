@@ -37,7 +37,7 @@ public class GameCore {
 	private static final String LOGNAME = "GameCore :: ";
 	
 	/** Game title */
-	private static final String title = "Game Title";
+	private static final String title = "Tecbot";
 	
 	/** Screen resolutions */
 	public static int SCR_WIDTH, SCR_HEIGHT;
